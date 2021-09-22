@@ -6,6 +6,11 @@ Actor playerref
 Message cumMessageBox
 Sound swallowing
 Sound spitting
+Spell UneffectedSpell
+Spell TolerantSpell
+Spell DependentSpell
+Spell AddictSpell
+Spell JunkieSpell
 Bool Property hasBottles Auto Conditional
 
 Event OnInit()
@@ -30,6 +35,13 @@ Event OnInit()
     cumMessageBox = Game.GetFormFromFile(0x000801, "OCumAddiction.esp") as Message
     swallowing = Game.GetFormFromFile(0x000805, "OCumAddiction.esp") as Sound
     spitting = Game.GetFormFromFile(0x000807, "OCumAddiction.esp") as Sound
+
+    UneffectedSpell = Game.GetFormFromFile(0x00080D, "OCumAddiction.esp") as Spell
+    TolerantSpell = Game.GetFormFromFile(0x00080E, "OCumAddiction.esp") as Spell
+    DependentSpell = Game.GetFormFromFile(0x000810, "OCumAddiction.esp") as Spell
+    AddictSpell = Game.GetFormFromFile(0x000811, "OCumAddiction.esp") as Spell
+    JunkieSpell = Game.GetFormFromFile(0x000812, "OCumAddiction.esp") as Spell
+    UneffectedSpell.Cast(playerref)
     OnLoad()
 EndEvent
 
@@ -76,9 +88,29 @@ Event OnEjaculation(string eventname, string strArg, float cumAmount, Form sende
         console("OCA Chose to swallow")
         Debug.Notification("You swallow every last drop of their load.")
         mcm.cumSwallowed += cumAmount
+        updateAddictionSpells()
         ostim.PlaySound(sucker, swallowing)
     EndIf
 EndEvent
+
+;todo - spells should auto dispel when another one is applied instead of through this script
+;todo - the spells need to update if the mcm settings are changed
+;todo - the spells will need to update when decay is implemented and this func doesn't handle that
+Function UpdateAddictionSpells()
+    If playerref.HasMagicEffect(UneffectedSpell.GetNthEffectMagicEffect(0)) && mcm.cumSwallowed > mcm.TolerantThreshhold
+        playerref.DispelSpell(UneffectedSpell)
+        TolerantSpell.Cast(playerref)
+    ElseIf playerref.HasMagicEffect(TolerantSpell.GetNthEffectMagicEffect(0)) && mcm.cumSwallowed > mcm.DependentThreshhold
+        playerref.DispelSpell(TolerantSpell)
+        DependentSpell.Cast(playerref)
+    ElseIf playerref.HasMagicEffect(DependentSpell.GetNthEffectMagicEffect(0)) && mcm.cumSwallowed > mcm.AddictThreshhold
+        playerref.DispelSpell(DependentSpell)
+        AddictSpell.Cast(playerref)
+    ElseIf playerref.HasMagicEffect(AddictSpell.GetNthEffectMagicEffect(0)) && mcm.cumSwallowed > mcm.JunkieThreshhold
+        playerref.DispelSpell(AddictSpell)
+        JunkieSpell.Cast(playerref)
+    EndIf
+EndFunction
 
 Int Function GetDefaultCumAction()
     return mcm.cumAction - 1
