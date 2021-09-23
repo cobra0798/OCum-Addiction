@@ -30,7 +30,7 @@ Event OnInit()
     JunkieThreshhold = 400.0
 
     cumActionStrings = new String[5]
-    cumActionStrings[0] = "None"
+    cumActionStrings[0] = "No Action"
     cumActionStrings[1] = "Spit"
     cumActionStrings[2] = "Swallow"
     cumActionStrings[3] = "Bottle, Spit Otherwise"
@@ -55,9 +55,6 @@ EndEvent
 State CUM_ACTION_STATE ;MENU
 
         event OnMenuOpenST()
-            oca.console("OCA: Menu Opened")
-            oca.console("OCA: Current cum action num = " + cumAction)
-            oca.console("OCA: Current cum action val = " + cumActionStrings[cumAction])
             SetMenuDialogStartIndex(cumAction)
             SetMenuDialogDefaultIndex(0)
             SetMenuDialogOptions(cumActionStrings)
@@ -65,8 +62,6 @@ State CUM_ACTION_STATE ;MENU
     
         event OnMenuAcceptST(int a_index)
             cumAction = a_index
-            oca.console("OCA: Cum action num chosen = " + a_index)
-            oca.console("OCA: Cum action val chosen = " + cumActionStrings[a_index])
             SetMenuOptionValueST(cumActionStrings[cumAction])
         endEvent
     
