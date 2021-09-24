@@ -75,6 +75,7 @@ Event OnEjaculation(string eventname, string strArg, float cumAmount, Form sende
     console("OCA ocum event received")
     console("OCA Cum ML = " + cumAmount)
     Actor sucker = ostim.GetSubActor()
+    Actor orgasmer = ostim.GetMostRecentOrgasmedActor()
     String animType = ostim.GetCurrentAnimationClass()
     Int cumAction = -1
     If autoCumAction == 0 ; If no default option was chosen
@@ -93,24 +94,35 @@ Event OnEjaculation(string eventname, string strArg, float cumAmount, Form sende
         console("OCA no action was taken")
         return
     ElseIf (autoCumAction > 2 && hasBottles) || cumAction == 2 && hasBottles ; bottle
-        console("OCA Chose to bottle")
+        Bottle(cumAmount, sucker, orgasmer)
     ElseIf cumAction == 0 || autoCumAction == 1 || autoCumAction == 3; spit, or swallow when no bottles
-        console("OCA Chose to spit")
-        Debug.Notification("You spit out their cum.")
-        cumSpit += cumAmount
-        ostim.PlaySound(sucker, spitting)
+        Spit(cumAmount, sucker, orgasmer)
     ElseIf cumAction == 1 || autoCumAction == 2 || autoCumAction == 4; swallow, or swallow when no bottles
-        console("OCA Chose to swallow")
-        Debug.Notification("You swallow every last drop of their load.")
-        cumSwallowed += cumAmount
-        updateAddictionSpells()
-        ostim.PlaySound(sucker, swallowing)
+        Swallow(cumAmount, sucker, orgasmer)
     EndIf
 EndEvent
 
-;todo - spells should auto dispel when another one is applied instead of through this script
-;todo - the spells need to update if the mcm settings are changed
-;todo - the spells will need to update when decay is implemented and this func doesn't handle that
+Function spit(Float cumAmount, Actor sucker, Actor orgasmer)
+    console("OCA Chose to spit")
+    Debug.Notification("You spit out their cum.")
+    cumSpit += cumAmount
+    ostim.PlaySound(sucker, spitting)
+EndFunction
+
+Function Swallow(Float cumAmount, Actor sucker, Actor orgasmer)
+    console("OCA Chose to swallow")
+    Debug.Notification("You swallow every last drop of their load.")
+    cumSwallowed += cumAmount
+    updateAddictionSpells()
+    ostim.PlaySound(sucker, swallowing)
+EndFunction
+
+Function Bottle(Float cumAmount, Actor sucker, Actor orgasmer)
+    console("OCA Chose to bottle")
+EndFunction
+
+;todo - the spells need to update if the mcm settings are changed - handle OnOptionAccept for the mcm sliders
+;todo - the spells will need to update when decay is implemented and this func doesn't handle that - handle when decay is calculated
 Function UpdateAddictionSpells()
     If playerref.HasMagicEffect(UneffectedSpell.GetNthEffectMagicEffect(0)) && cumSwallowed > TolerantThreshhold
         playerref.AddSpell(TolerantSpell)
