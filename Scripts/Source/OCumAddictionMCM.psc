@@ -17,7 +17,7 @@ OCumAddictionScript oca
 String[] cumActionStrings
 String[] pointsOfView
 
-Event OnInit()
+Event OnConfigInit()
     oca = (Self as Quest) as OCumAddictionScript
     pages = new String[1]
     pages[0] = "main"
