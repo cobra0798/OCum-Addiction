@@ -9,7 +9,7 @@ scriptname OCumAddictionScript extends Quest Conditional
 Int cumActionField
 Int Property cumAction
     Int Function Get()
-        return cumActionField - 1
+        return cumActionField
     EndFunction
     Function Set(Int value)
         cumActionField = value
@@ -96,17 +96,17 @@ Event OnEjaculation(string eventname, string strArg, float cumAmount, Form sende
         EndIf
     EndIf
 
-    If cumAction == -1 ; no action was taken
+    If cumAction == 0 ; no action was taken
         console("OCA no action was taken")
         return
-    ElseIf cumAction > 1 && hasBottles ; bottle
+    ElseIf cumAction > 2 && hasBottles ; bottle
         console("OCA Chose to bottle")
-    ElseIf cumAction == 0 || cumAction == 2; spit, or swallow when no bottles
+    ElseIf cumAction == 1 || cumAction == 3; spit, or swallow when no bottles
         console("OCA Chose to spit")
         Debug.Notification("You spit out their cum.")
         cumSpit += cumAmount
         ostim.PlaySound(sucker, spitting)
-    ElseIf cumAction == 1 || cumAction == 3; swallow, or swallow when no bottles
+    ElseIf cumAction == 2 || cumAction == 4; swallow, or swallow when no bottles
         console("OCA Chose to swallow")
         Debug.Notification("You swallow every last drop of their load.")
         cumSwallowed += cumAmount
