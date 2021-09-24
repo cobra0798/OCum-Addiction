@@ -1,5 +1,29 @@
 scriptname OCumAddictionScript extends Quest Conditional
 
+;properties
+;0 None
+;1 spit
+;2 swallow
+;3 bottle, spit otherwise
+;4 bottle, swallow otherwise
+Int cumActionField
+Int Property cumAction
+    Int Function Get()
+        return cumActionField - 1
+    EndFunction
+    Function Set(Int value)
+        cumActionField = value
+    EndFunction
+EndProperty
+    
+Float Property cumSwallowed Auto
+Float Property cumSpit Auto
+Float Property TolerantThreshhold Auto
+Float Property DependentThreshhold Auto
+Float Property AddictThreshhold Auto
+Float Property JunkieThreshhold Auto
+Bool Property hasBottles Auto Conditional
+
 OSexIntegrationMain ostim
 OCumAddictionMCM mcm
 Actor playerref
@@ -11,7 +35,6 @@ Spell TolerantSpell
 Spell DependentSpell
 Spell AddictSpell
 Spell JunkieSpell
-Bool Property hasBottles Auto Conditional
 
 Event OnInit()
     Debug.Notification("OCum - Addiction installed")
@@ -60,7 +83,6 @@ Event OnEjaculation(string eventname, string strArg, float cumAmount, Form sende
     console("OCA ocum event received")
     console("OCA Cum ML = " + cumAmount)
     Actor sucker = ostim.GetSubActor()
-    Int cumAction = getDefaultCumAction()
     String animType = ostim.GetCurrentAnimationClass()
     If cumAction == -1 ; If no default option was chosen
         console("OCA no default option was chosen.")
@@ -82,12 +104,12 @@ Event OnEjaculation(string eventname, string strArg, float cumAmount, Form sende
     ElseIf cumAction == 0 || cumAction == 2; spit, or swallow when no bottles
         console("OCA Chose to spit")
         Debug.Notification("You spit out their cum.")
-        mcm.cumSpit += cumAmount
+        cumSpit += cumAmount
         ostim.PlaySound(sucker, spitting)
     ElseIf cumAction == 1 || cumAction == 3; swallow, or swallow when no bottles
         console("OCA Chose to swallow")
         Debug.Notification("You swallow every last drop of their load.")
-        mcm.cumSwallowed += cumAmount
+        cumSwallowed += cumAmount
         updateAddictionSpells()
         ostim.PlaySound(sucker, swallowing)
     EndIf
@@ -97,23 +119,19 @@ EndEvent
 ;todo - the spells need to update if the mcm settings are changed
 ;todo - the spells will need to update when decay is implemented and this func doesn't handle that
 Function UpdateAddictionSpells()
-    If playerref.HasMagicEffect(UneffectedSpell.GetNthEffectMagicEffect(0)) && mcm.cumSwallowed > mcm.TolerantThreshhold
+    If playerref.HasMagicEffect(UneffectedSpell.GetNthEffectMagicEffect(0)) && cumSwallowed > TolerantThreshhold
         playerref.DispelSpell(UneffectedSpell)
         TolerantSpell.Cast(playerref)
-    ElseIf playerref.HasMagicEffect(TolerantSpell.GetNthEffectMagicEffect(0)) && mcm.cumSwallowed > mcm.DependentThreshhold
+    ElseIf playerref.HasMagicEffect(TolerantSpell.GetNthEffectMagicEffect(0)) && cumSwallowed > DependentThreshhold
         playerref.DispelSpell(TolerantSpell)
         DependentSpell.Cast(playerref)
-    ElseIf playerref.HasMagicEffect(DependentSpell.GetNthEffectMagicEffect(0)) && mcm.cumSwallowed > mcm.AddictThreshhold
+    ElseIf playerref.HasMagicEffect(DependentSpell.GetNthEffectMagicEffect(0)) && cumSwallowed > AddictThreshhold
         playerref.DispelSpell(DependentSpell)
         AddictSpell.Cast(playerref)
-    ElseIf playerref.HasMagicEffect(AddictSpell.GetNthEffectMagicEffect(0)) && mcm.cumSwallowed > mcm.JunkieThreshhold
+    ElseIf playerref.HasMagicEffect(AddictSpell.GetNthEffectMagicEffect(0)) && cumSwallowed > JunkieThreshhold
         playerref.DispelSpell(AddictSpell)
         JunkieSpell.Cast(playerref)
     EndIf
-EndFunction
-
-Int Function GetDefaultCumAction()
-    return mcm.cumAction - 1
 EndFunction
 
 Function console(String in)

@@ -1,17 +1,5 @@
 scriptname OCumAddictionMCM extends SKI_ConfigBase
 
-;0 None
-;1 spit
-;2 swallow
-;3 bottle, spit otherwise
-;4 bottle, swallow otherwise
-Int Property cumAction Auto
-Float Property cumSwallowed Auto
-Float Property cumSpit Auto
-Float Property TolerantThreshhold Auto
-Float Property DependentThreshhold Auto
-Float Property AddictThreshhold Auto
-Float Property JunkieThreshhold Auto
 OCumAddictionScript oca
 
 String[] cumActionStrings
@@ -21,13 +9,13 @@ Event OnConfigInit()
     oca = (Self as Quest) as OCumAddictionScript
     pages = new String[1]
     pages[0] = "main"
-    cumAction = 0
-    cumSwallowed = 0.0
-    cumSpit = 0.0
-    TolerantThreshhold = 100.0
-    DependentThreshhold = 200.0
-    AddictThreshhold = 300.0
-    JunkieThreshhold = 400.0
+    oca.cumAction = 0
+    oca.cumSwallowed = 0.0
+    oca.cumSpit = 0.0
+    oca.TolerantThreshhold = 100.0
+    oca.DependentThreshhold = 200.0
+    oca.AddictThreshhold = 300.0
+    oca.JunkieThreshhold = 400.0
 
     cumActionStrings = new String[5]
     cumActionStrings[0] = "No Action"
@@ -40,13 +28,13 @@ EndEvent
 Event OnPageReset(string page)
     If (page == "main")
         SetCursorFillMode(TOP_TO_BOTTOM)
-        AddMenuOptionST("CUM_ACTION_STATE", "Spit, Swallow, or Bottle", cumActionStrings[cumAction])
-        AddTextOptionST("CUM_SWALLOWED_STATE", "Cum Swallowed", cumSwallowed)
-        AddTextOptionST("CUM_SPIT_STATE", "Cum Spit", cumSpit)
-        AddSliderOptionST("TOLERANT_THRESHHOLD_STATE", "Tolerance Theshhold", TolerantThreshhold, "{1}")
-        AddSliderOptionST("DEPENDENT_THRESHHOLD_STATE", "Dependence Theshhold", DependentThreshhold, "{1}")
-        AddSliderOptionST("ADDICT_THRESHHOLD_STATE", "Addict Theshhold", AddictThreshhold, "{1}")
-        AddSliderOptionST("JUNKIE_THRESHHOLD_STATE", "Junkie Theshhold", JunkieThreshhold, "{1}")
+        AddMenuOptionST("CUM_ACTION_STATE", "Spit, Swallow, or Bottle", cumActionStrings[oca.cumAction])
+        AddTextOptionST("CUM_SWALLOWED_STATE", "Cum Swallowed", oca.cumSwallowed)
+        AddTextOptionST("CUM_SPIT_STATE", "Cum Spit", oca.cumSpit)
+        AddSliderOptionST("TOLERANT_THRESHHOLD_STATE", "Tolerance Theshhold", oca.TolerantThreshhold, "{1}")
+        AddSliderOptionST("DEPENDENT_THRESHHOLD_STATE", "Dependence Theshhold", oca.DependentThreshhold, "{1}")
+        AddSliderOptionST("ADDICT_THRESHHOLD_STATE", "Addict Theshhold", oca.AddictThreshhold, "{1}")
+        AddSliderOptionST("JUNKIE_THRESHHOLD_STATE", "Junkie Theshhold", oca.JunkieThreshhold, "{1}")
         AddTextOptionST("IMPORT_STATE", "Import", "Click")
         AddTextOptionST("EXPORT_STATE", "Export", "Click")
     EndIf
@@ -55,19 +43,19 @@ EndEvent
 State CUM_ACTION_STATE ;MENU
 
         event OnMenuOpenST()
-            SetMenuDialogStartIndex(cumAction)
+            SetMenuDialogStartIndex(oca.cumAction)
             SetMenuDialogDefaultIndex(0)
             SetMenuDialogOptions(cumActionStrings)
         endEvent
     
         event OnMenuAcceptST(int a_index)
-            cumAction = a_index
-            SetMenuOptionValueST(cumActionStrings[cumAction])
+            oca.cumAction = a_index
+            SetMenuOptionValueST(cumActionStrings[oca.cumAction])
         endEvent
     
         event OnDefaultST()
-            cumAction = 0    
-            SetTextOptionValueST(cumActionStrings[cumAction])
+            oca.cumAction = 0    
+            SetTextOptionValueST(cumActionStrings[oca.cumAction])
         endEvent
     
         event OnHighlightST()
@@ -113,24 +101,24 @@ EndState
 
 State TOLERANT_THRESHHOLD_STATE ;SLIDER
     Event OnSliderOpenST()
-        SetSliderDialogStartValue(TolerantThreshhold)
+        SetSliderDialogStartValue(oca.TolerantThreshhold)
 		SetSliderDialogDefaultValue(100)
 		SetSliderDialogRange(0, 400)
 		SetSliderDialogInterval(1)
     EndEvent
 
     Event OnSliderAcceptST(float option)
-        If option > 0 && option < DependentThreshhold
-            TolerantThreshhold = option
-            SetSliderOptionValueST(TolerantThreshhold)
+        If option > 0 && option < oca.DependentThreshhold
+            oca.TolerantThreshhold = option
+            SetSliderOptionValueST(oca.TolerantThreshhold)
         Else
             ShowMessage("Please make sure that the tolerance threshhold is greater than 0 and less than the dependence threshhold.", False)
         EndIf
     EndEvent
 
     Event OnDefaultST()
-        TolerantThreshhold = 100.0
-        SetSliderOptionValueST(TolerantThreshhold)
+        oca.TolerantThreshhold = 100.0
+        SetSliderOptionValueST(oca.TolerantThreshhold)
     EndEvent
 
     Event OnHighlightST()
@@ -140,24 +128,24 @@ EndState
 
 State DEPENDENT_THRESHHOLD_STATE ;SLIDER
     Event OnSliderOpenST()
-        SetSliderDialogStartValue(DependentThreshhold)
+        SetSliderDialogStartValue(oca.DependentThreshhold)
 		SetSliderDialogDefaultValue(200)
 		SetSliderDialogRange(0, 400)
 		SetSliderDialogInterval(1)
     EndEvent
 
     Event OnSliderAcceptST(float option)
-        If option > TolerantThreshhold && option < AddictThreshhold
-            DependentThreshhold = option
-            SetSliderOptionValueST(DependentThreshhold)
+        If option > oca.TolerantThreshhold && option < oca.AddictThreshhold
+            oca.DependentThreshhold = option
+            SetSliderOptionValueST(oca.DependentThreshhold)
         Else
             ShowMessage("Please make sure that the dependence threshhold is greater than the tolerance threshhold and less than the addict threshhold.", False)
         EndIf
     EndEvent
 
     Event OnDefaultST()
-        DependentThreshhold = 200.0
-        SetSliderOptionValueST(DependentThreshhold)
+        oca.DependentThreshhold = 200.0
+        SetSliderOptionValueST(oca.DependentThreshhold)
     EndEvent
 
     Event OnHighlightST()
@@ -167,24 +155,24 @@ EndState
 
 State ADDICT_THRESHHOLD_STATE ;SLIDER
     Event OnSliderOpenST()
-        SetSliderDialogStartValue(AddictThreshhold)
+        SetSliderDialogStartValue(oca.AddictThreshhold)
 		SetSliderDialogDefaultValue(300)
 		SetSliderDialogRange(0, 400)
 		SetSliderDialogInterval(1)
     EndEvent
 
     Event OnSliderAcceptST(float option)
-        If option > DependentThreshhold && option < JunkieThreshhold
-            AddictThreshhold = option
-            SetSliderOptionValueST(AddictThreshhold)
+        If option > oca.DependentThreshhold && option < oca.JunkieThreshhold
+            oca.AddictThreshhold = option
+            SetSliderOptionValueST(oca.AddictThreshhold)
         Else
             ShowMessage("Please make sure that the addict threshhold is greater than the dependence threshhold and less than the junkie threshhold.", False)
         EndIf
     EndEvent
 
     Event OnDefaultST()
-        AddictThreshhold = 300.0
-        SetSliderOptionValueST(AddictThreshhold)
+        oca.AddictThreshhold = 300.0
+        SetSliderOptionValueST(oca.AddictThreshhold)
     EndEvent
 
     Event OnHighlightST()
@@ -194,24 +182,24 @@ EndState
 
 State JUNKIE_THRESHHOLD_STATE ;SLIDER
     Event OnSliderOpenST()
-        SetSliderDialogStartValue(JunkieThreshhold)
+        SetSliderDialogStartValue(oca.JunkieThreshhold)
 		SetSliderDialogDefaultValue(400)
 		SetSliderDialogRange(0, 400)
 		SetSliderDialogInterval(1)
     EndEvent
 
     Event OnSliderAcceptST(float option)
-        If option > AddictThreshhold
-            JunkieThreshhold = option
-            SetSliderOptionValueST(JunkieThreshhold)
+        If option > oca.AddictThreshhold
+            oca.JunkieThreshhold = option
+            SetSliderOptionValueST(oca.JunkieThreshhold)
         Else
             ShowMessage("Please make sure that the tolerance threshhold is greater than the addict threshhold.", False)
         EndIf
     EndEvent
 
     Event OnDefaultST()
-        JunkieThreshhold = 400.0
-        SetSliderOptionValueST(JunkieThreshhold)
+        oca.JunkieThreshhold = 400.0
+        SetSliderOptionValueST(oca.JunkieThreshhold)
     EndEvent
 
     Event OnHighlightST()
@@ -227,20 +215,20 @@ Function ImportSettings()
 		ocaMCMSettings = JValue.readFromFile(".\\Data\\OcaMCMSettings.json")
 	endif
     If ocaMCMSettings
-        TolerantThreshhold = JMap.GetFlt(ocaMCMSettings, "tolerantThreshhold")
-        DependentThreshhold = JMap.GetFlt(ocaMCMSettings, "dependentThreshhold")
-        AddictThreshhold = JMap.GetFlt(ocaMCMSettings, "addictThreshhold")
-        JunkieThreshhold = JMap.GetFlt(ocaMCMSettings, "junkieThreshhold")
+        oca.TolerantThreshhold = JMap.GetFlt(ocaMCMSettings, "tolerantThreshhold")
+        oca.DependentThreshhold = JMap.GetFlt(ocaMCMSettings, "dependentThreshhold")
+        oca.AddictThreshhold = JMap.GetFlt(ocaMCMSettings, "addictThreshhold")
+        oca.JunkieThreshhold = JMap.GetFlt(ocaMCMSettings, "junkieThreshhold")
         ForcePageReset()
     EndIf
 EndFunction
 
 Function ExportSettings()
     Int ocaMCMSettings = JMap.object()
-    JMap.SetFlt(ocaMCMSettings, "tolerantThreshhold", TolerantThreshhold)
-    JMap.SetFlt(ocaMCMSettings, "dependentThreshhold", DependentThreshhold)
-    JMap.SetFlt(ocaMCMSettings, "addictThreshhold", AddictThreshhold)
-    JMap.SetFlt(ocaMCMSettings, "junkieThreshhold", JunkieThreshhold)
+    JMap.SetFlt(ocaMCMSettings, "tolerantThreshhold", oca.TolerantThreshhold)
+    JMap.SetFlt(ocaMCMSettings, "dependentThreshhold", oca.DependentThreshhold)
+    JMap.SetFlt(ocaMCMSettings, "addictThreshhold", oca.AddictThreshhold)
+    JMap.SetFlt(ocaMCMSettings, "junkieThreshhold", oca.JunkieThreshhold)
     
     Jvalue.WriteToFile(ocaMCMSettings, JContainers.UserDirectory() + "OcaMCMSettings.json")
     ForcePageReset()
