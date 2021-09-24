@@ -84,7 +84,7 @@ Event OnEjaculation(string eventname, string strArg, float cumAmount, Form sende
     console("OCA Cum ML = " + cumAmount)
     Actor sucker = ostim.GetSubActor()
     String animType = ostim.GetCurrentAnimationClass()
-    If cumAction == -1 ; If no default option was chosen
+    If cumAction == 0 ; If no default option was chosen
         console("OCA no default option was chosen.")
         If sucker == playerref && cumAmount > 0.0 && (animType == "BJ" || animType == "HhBJ" || animType == "AgBJ" || animType == "DBJ")
             cumAction = cumMessageBox.Show()
