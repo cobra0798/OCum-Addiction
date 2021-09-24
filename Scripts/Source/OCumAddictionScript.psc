@@ -64,7 +64,7 @@ Event OnInit()
     DependentSpell = Game.GetFormFromFile(0x000810, "OCumAddiction.esp") as Spell
     AddictSpell = Game.GetFormFromFile(0x000811, "OCumAddiction.esp") as Spell
     JunkieSpell = Game.GetFormFromFile(0x000812, "OCumAddiction.esp") as Spell
-    UneffectedSpell.Cast(playerref)
+    playerref.AddSpell(UneffectedSpell, false)
     OnLoad()
 EndEvent
 
@@ -120,17 +120,13 @@ EndEvent
 ;todo - the spells will need to update when decay is implemented and this func doesn't handle that
 Function UpdateAddictionSpells()
     If playerref.HasMagicEffect(UneffectedSpell.GetNthEffectMagicEffect(0)) && cumSwallowed > TolerantThreshhold
-        playerref.DispelSpell(UneffectedSpell)
-        TolerantSpell.Cast(playerref)
+        playerref.AddSpell(TolerantSpell)
     ElseIf playerref.HasMagicEffect(TolerantSpell.GetNthEffectMagicEffect(0)) && cumSwallowed > DependentThreshhold
-        playerref.DispelSpell(TolerantSpell)
-        DependentSpell.Cast(playerref)
+        playerref.AddSpell(DependentSpell)
     ElseIf playerref.HasMagicEffect(DependentSpell.GetNthEffectMagicEffect(0)) && cumSwallowed > AddictThreshhold
-        playerref.DispelSpell(DependentSpell)
-        AddictSpell.Cast(playerref)
+        playerref.AddSpell(AddictSpell)
     ElseIf playerref.HasMagicEffect(AddictSpell.GetNthEffectMagicEffect(0)) && cumSwallowed > JunkieThreshhold
-        playerref.DispelSpell(AddictSpell)
-        JunkieSpell.Cast(playerref)
+        playerref.AddSpell(JunkieSpell)
     EndIf
 EndFunction
 
