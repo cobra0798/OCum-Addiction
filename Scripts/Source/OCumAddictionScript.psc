@@ -76,7 +76,7 @@ Event OnEjaculation(string eventname, string strArg, float cumAmount, Form sende
     console("OCA Cum ML = " + cumAmount)
     Actor sucker = ostim.GetSubActor()
     String animType = ostim.GetCurrentAnimationClass()
-    Int cumAction = 0
+    Int cumAction = -1
     If autoCumAction == 0 ; If no default option was chosen
         console("OCA no default option was chosen.")
         If sucker == playerref && cumAmount > 0.0 && (animType == "BJ" || animType == "HhBJ" || animType == "AgBJ" || animType == "DBJ")
@@ -89,17 +89,17 @@ Event OnEjaculation(string eventname, string strArg, float cumAmount, Form sende
         EndIf
     EndIf
 
-    If cumAction == 0 && autoCumAction == 0; no action was taken
+    If autoCumAction == 0 && cumAction == -1; no action was taken
         console("OCA no action was taken")
         return
-    ElseIf autoCumAction > 2 && hasBottles ; bottle
+    ElseIf (autoCumAction > 2 && hasBottles) || cumAction == 2 && hasBottles ; bottle
         console("OCA Chose to bottle")
-    ElseIf cumAction == 1 || autoCumAction == 1 || autoCumAction == 3; spit, or swallow when no bottles
+    ElseIf cumAction == 0 || autoCumAction == 1 || autoCumAction == 3; spit, or swallow when no bottles
         console("OCA Chose to spit")
         Debug.Notification("You spit out their cum.")
         cumSpit += cumAmount
         ostim.PlaySound(sucker, spitting)
-    ElseIf cumAction == 2 || autoCumAction == 2 || autoCumAction == 4; swallow, or swallow when no bottles
+    ElseIf cumAction == 1 || autoCumAction == 2 || autoCumAction == 4; swallow, or swallow when no bottles
         console("OCA Chose to swallow")
         Debug.Notification("You swallow every last drop of their load.")
         cumSwallowed += cumAmount
