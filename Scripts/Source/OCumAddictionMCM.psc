@@ -9,7 +9,7 @@ Event OnConfigInit()
     oca = (Self as Quest) as OCumAddictionScript
     pages = new String[1]
     pages[0] = "main"
-    oca.cumAction = 0
+    oca.autoCumAction = 0
     oca.cumSwallowed = 0.0
     oca.cumSpit = 0.0
     oca.TolerantThreshhold = 100.0
@@ -28,7 +28,7 @@ EndEvent
 Event OnPageReset(string page)
     If (page == "main")
         SetCursorFillMode(TOP_TO_BOTTOM)
-        AddMenuOptionST("CUM_ACTION_STATE", "Spit, Swallow, or Bottle", cumActionStrings[oca.cumAction])
+        AddMenuOptionST("CUM_ACTION_STATE", "Spit, Swallow, or Bottle", cumActionStrings[oca.autoCumAction])
         AddTextOptionST("CUM_SWALLOWED_STATE", "Cum Swallowed", oca.cumSwallowed)
         AddTextOptionST("CUM_SPIT_STATE", "Cum Spit", oca.cumSpit)
         AddSliderOptionST("TOLERANT_THRESHHOLD_STATE", "Tolerance Theshhold", oca.TolerantThreshhold, "{1}")
@@ -43,19 +43,19 @@ EndEvent
 State CUM_ACTION_STATE ;MENU
 
         event OnMenuOpenST()
-            SetMenuDialogStartIndex(oca.cumAction)
+            SetMenuDialogStartIndex(oca.autoCumAction)
             SetMenuDialogDefaultIndex(0)
             SetMenuDialogOptions(cumActionStrings)
         endEvent
     
         event OnMenuAcceptST(int a_index)
-            oca.cumAction = a_index
-            SetMenuOptionValueST(cumActionStrings[oca.cumAction])
+            oca.autoCumAction = a_index
+            SetMenuOptionValueST(cumActionStrings[oca.autoCumAction])
         endEvent
     
         event OnDefaultST()
-            oca.cumAction = 0    
-            SetTextOptionValueST(cumActionStrings[oca.cumAction])
+            oca.autoCumAction = 0    
+            SetTextOptionValueST(cumActionStrings[oca.autoCumAction])
         endEvent
     
         event OnHighlightST()
