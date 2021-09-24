@@ -14,6 +14,12 @@ Float Property TolerantThreshhold Auto
 Float Property DependentThreshhold Auto
 Float Property AddictThreshhold Auto
 Float Property JunkieThreshhold Auto
+Float Property DigestRate Auto
+Float Property DecayRate Auto
+Float Property timeLastSwallowed Auto
+Float Property timeSinceLastUpdate Auto
+Float Property bellyCum Auto
+Float Property addictionPoints Auto
 Bool Property hasBottles Auto Conditional
 
 OSexIntegrationMain ostim
@@ -57,6 +63,9 @@ Event OnInit()
     AddictSpell = Game.GetFormFromFile(0x000811, "OCumAddiction.esp") as Spell
     JunkieSpell = Game.GetFormFromFile(0x000812, "OCumAddiction.esp") as Spell
     playerref.AddSpell(UneffectedSpell, false)
+
+    timeLastSwallowed = -1.0
+    bellyCum = 0.0
     OnLoad()
 EndEvent
 
@@ -113,6 +122,7 @@ Function Swallow(Float cumAmount, Actor sucker, Actor orgasmer)
     console("OCA Chose to swallow")
     Debug.Notification("You swallow every last drop of their load.")
     cumSwallowed += cumAmount
+    AdjustBelly(cumAmount)
     updateAddictionSpells()
     ostim.PlaySound(sucker, swallowing)
 EndFunction
@@ -132,6 +142,57 @@ Function UpdateAddictionSpells()
         playerref.AddSpell(AddictSpell)
     ElseIf playerref.HasMagicEffect(AddictSpell.GetNthEffectMagicEffect(0)) && cumSwallowed > JunkieThreshhold
         playerref.AddSpell(JunkieSpell)
+    EndIf
+EndFunction
+
+Int Function GetAddictionLevel()
+    If (addictionPoints < TolerantThreshhold)
+        return 0
+    ElseIf (addictionPoints >= TolerantThreshhold && addictionPoints < DependentThreshhold)
+        return 1
+    ElseIf (addictionPoints >= DependentThreshhold && addictionPoints < AddictThreshhold)
+        return 2
+    ElseIf (addictionPoints >= AddictThreshhold && addictionPoints < JunkieThreshhold)
+        return 3
+    ElseIf (addictionPoints >= JunkieThreshhold)
+        return 4
+    EndIf
+EndFunction
+
+Function AdjustBelly(Float cumAmount)
+    timeLastSwallowed = Utility.GetCurrentGameTime()
+    UpdateBelly()
+    bellyCum += cumAmount
+EndFunction
+
+;todo - profile this to make sure it isn't laggy as fuck
+Function UpdateBelly()
+    If (bellyCum > 0)
+        Float curTime = Utility.GetCurrentGameTime()
+        Float digest = (curTime - timeSinceLastUpdate) * 24 * DigestRate ; flat starting rate per hr
+        Int AddictionLevel = GetAddictionLevel() 
+        digest = digest * (1 + AddictionLevel / 2 - 1 / (AddictionLevel + 2)) ;50%, 117%, 175%, 230%, 284% as you become more addicted, you digest cum faster so it's harder to stave off withdrawl
+        If (bellyCum < digest)
+            bellyCum = 0
+        Else
+            bellyCum -= digest
+        EndIf
+        timeSinceLastUpdate = curTime
+    EndIf
+EndFunction
+
+Function UpdateAddictionPoints(float timePassed)
+    Float decay = timePassed * 24 * DecayRate
+    decay = decay * (1 - (1 / (5 - GetAddictionLevel()) + 1 / 5)) ;100%, 95%, 87%, 70%, 20%
+    addictionPoints -= decay
+    UpdateAddictionSpells()
+EndFunction
+
+Float Function timeSinceLastSwallowed()
+    If timeLastSwallowed > 0
+        return Utility.GetCurrentGameTime() - timeLastSwallowed
+    Else
+        return -1
     EndIf
 EndFunction
 
