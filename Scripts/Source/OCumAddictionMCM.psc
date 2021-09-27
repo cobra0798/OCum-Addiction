@@ -7,8 +7,9 @@ String[] pointsOfView
 
 Event OnConfigInit()
     oca = (Self as Quest) as OCumAddictionScript
-    pages = new String[1]
+    pages = new String[2]
     pages[0] = "main"
+    pages[1] = "stats"
     oca.autoCumAction = 0
     oca.cumSwallowed = 0.0
     oca.cumSpit = 0.0
@@ -29,8 +30,6 @@ Event OnPageReset(string page)
     If (page == "main")
         SetCursorFillMode(TOP_TO_BOTTOM)
         AddMenuOptionST("CUM_ACTION_STATE", "Spit, Swallow, or Bottle", cumActionStrings[oca.autoCumAction])
-        AddTextOptionST("CUM_SWALLOWED_STATE", "Cum Swallowed", oca.cumSwallowed)
-        AddTextOptionST("CUM_SPIT_STATE", "Cum Spit", oca.cumSpit)
         AddSliderOptionST("TOLERANT_THRESHHOLD_STATE", "Tolerance Theshhold", oca.TolerantThreshhold, "{1} ML")
         AddSliderOptionST("DEPENDENT_THRESHHOLD_STATE", "Dependence Theshhold", oca.DependentThreshhold, "{1} ML")
         AddSliderOptionST("ADDICT_THRESHHOLD_STATE", "Addict Theshhold", oca.AddictThreshhold, "{1} ML")
@@ -39,6 +38,13 @@ Event OnPageReset(string page)
         AddSliderOptionST("DECAY_RATE_STATE", "Decay Rate", oca.DecayRate, "{1} ML/HR")
         AddTextOptionST("IMPORT_STATE", "Import", "Click")
         AddTextOptionST("EXPORT_STATE", "Export", "Click")
+    ElseIf(page == "stats")
+        AddTextOptionST("CUM_SWALLOWED_STATE", "Cum Swallowed", oca.cumSwallowed)
+        AddTextOptionST("CUM_SPIT_STATE", "Cum Spit", oca.cumSpit)
+        AddTextOptionST("BELLY_CUM_STATE", "Cum in belly", oca.bellyCum)
+        AddTextOptionST("ADDICTION_POINTS_STATE", "Addiction Points", oca.addictionPoints)
+        AddTextOptionST("TIME_LAST_SWALLOWED_STATE", "Last swallowed", oca.timeLastSwallowed)
+        AddTextOptionST("TIME_SINCE_LAST_UPDATE_STATE", "Last belly update", oca.timeSinceLastUpdate)
     EndIf
 EndEvent
 
@@ -63,18 +69,6 @@ State CUM_ACTION_STATE ;MENU
         event OnHighlightST()
             SetInfoText("Sets the default action to take for blowjobs in which the player is giving.")
         endEvent
-EndState
-
-State CUM_SWALLOWED_STATE ;TEXT
-    event OnHighlightST()
-        SetInfoText("The total amount of cum you have swallowed.")
-    endEvent
-EndState
-
-State CUM_SPIT_STATE ;TEXT
-    event OnHighlightST()
-        SetInfoText("The total amount of cum you have spit out.")
-    endEvent
 EndState
 
 State IMPORT_STATE ;TEXT
@@ -254,6 +248,44 @@ State DECAY_RATE_STATE ;SLIDER
         SetInfoText("This is the rate at which your addiction to cum will dwindle relative to the amount of cum in your belly.")
     EndEvent
 EndState
+
+;STATS PAGE
+State CUM_SWALLOWED_STATE ;TEXT
+    event OnHighlightST()
+        SetInfoText("The total amount of cum you have swallowed.")
+    endEvent
+EndState
+
+State CUM_SPIT_STATE ;TEXT
+    event OnHighlightST()
+        SetInfoText("The total amount of cum you have spit out.")
+    endEvent
+EndState
+
+State BELLY_CUM_STATE ;TEXT
+    event OnHighlightST()
+        SetInfoText("The amount of cum currently in your belly.")
+    endEvent
+EndState
+
+State ADDICTION_POINTS_STATE ;TEXT
+    event OnHighlightST()
+        SetInfoText("The number of addiction points you have accrued.")
+    endEvent
+EndState
+
+State TIME_LAST_SWALLOWED_STATE ;TEXT
+    event OnHighlightST()
+        SetInfoText("The last time you swallowed cum.")
+    endEvent
+EndState
+
+State TIME_SINCE_LAST_UPDATE_STATE ;TEXT
+    event OnHighlightST()
+        SetInfoText("The last time the belly cum volume was updated.")
+    endEvent
+EndState
+
 
 Function ImportSettings()
     Int ocaMCMSettings
