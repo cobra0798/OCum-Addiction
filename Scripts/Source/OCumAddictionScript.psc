@@ -20,6 +20,7 @@ Float Property timeLastSwallowed Auto
 Float Property timeSinceLastUpdate Auto
 Float Property bellyCum Auto
 Float Property addictionPoints Auto
+Int Property AddictionLevel Auto Conditional
 Bool Property hasBottles Auto Conditional
 Bool Property debugMode Auto
 
@@ -159,21 +160,21 @@ Function UpdateAddictionSpells()
     EndIf
 EndFunction
 
-Int Function GetAddictionLevel()
+Function SetAddictionLevel()
     If (DebugMode)
-        console("OCA Getting addiction level")
+        console("OCA Setting addiction level")
         console("addiction points = " + addictionPoints)
     EndIf
     If (addictionPoints < TolerantThreshhold)
-        return 0
+        AddictionLevel = 0
     ElseIf (addictionPoints >= TolerantThreshhold && addictionPoints < DependentThreshhold)
-        return 1
+        AddictionLevel = 1
     ElseIf (addictionPoints >= DependentThreshhold && addictionPoints < AddictThreshhold)
-        return 2
+        AddictionLevel = 2
     ElseIf (addictionPoints >= AddictThreshhold && addictionPoints < JunkieThreshhold)
-        return 3
+        AddictionLevel = 3
     ElseIf (addictionPoints >= JunkieThreshhold)
-        return 4
+        AddictionLevel = 4
     EndIf
 EndFunction
 
@@ -202,7 +203,7 @@ Function UpdateBelly()
             console("OCA curTime = " + curTime)
             console("OCA digest before addiction level = " + digest)
         EndIf
-        Int AddictionLevel = GetAddictionLevel() 
+        SetAddictionLevel() 
         digest = digest * (1 + AddictionLevel / 2 - 1 / (AddictionLevel + 2)) ;50%, 117%, 175%, 230%, 284% as you become more addicted, you digest cum faster so it's harder to stave off withdrawl
         If (DebugMode)
             console("OCA addiction level = " + AddictionLevel)
@@ -221,8 +222,9 @@ Function UpdateAddictionPoints(float timePassed)
     If (DebugMode)
         console("OCA updating addiction points")
     EndIf
+    SetAddictionLevel()
     Float decay = timePassed * 24 * DecayRate
-    decay = decay * (1 - (1 / (5 - GetAddictionLevel()) + 1 / 5)) ;100%, 95%, 87%, 70%, 20%
+    decay = decay * (1 - (1 / (5 - AddictionLevel) + 1 / 5)) ;100%, 95%, 87%, 70%, 20%
     addictionPoints -= decay
     If (debugMode)
         console("decay before addiction level = " + (timePassed * 24 * DecayRate))
