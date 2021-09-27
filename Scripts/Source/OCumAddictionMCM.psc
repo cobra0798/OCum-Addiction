@@ -17,6 +17,8 @@ Event OnConfigInit()
     oca.DependentThreshhold = 200.0
     oca.AddictThreshhold = 300.0
     oca.JunkieThreshhold = 400.0
+    oca.DecayRate = 1.0
+    oca.DigestRate = 1.0
     oca.debugMode = True
 
     cumActionStrings = new String[5]
