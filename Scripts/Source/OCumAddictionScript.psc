@@ -82,17 +82,21 @@ Event OnScenePreStart(string eventname, string strArg, float numArg, Form sender
 EndEvent
 
 Event OnEjaculation(string eventname, string strArg, float cumAmount, Form sender)
-    console("OCA ocum event received")
-    console("OCA Cum ML = " + cumAmount)
+    If debugMode
+        console("OCA ocum event received")
+        console("OCA Cum ML = " + cumAmount)
+    EndIf
     Actor sucker = ostim.GetSubActor()
     Actor orgasmer = ostim.GetMostRecentOrgasmedActor()
     String animType = ostim.GetCurrentAnimationClass()
     Int cumAction = -1
     If autoCumAction == 0 ; If no default option was chosen
-        console("OCA no default option was chosen.")
+        if debugMode
+            console("OCA no default option was chosen.")
+        EndIf
         If sucker == playerref && cumAmount > 0.0 && (animType == "BJ" || animType == "HhBJ" || animType == "AgBJ" || animType == "DBJ")
             cumAction = cumMessageBox.Show()
-        Else
+        ElseIf debugMode
             console("OCA " + sucker.GetDisplayName() + " == playerref: " + (sucker == playerref))
             console("OCA " + cumAmount + " > 0.0: " + (cumAmount > 0.0))
             console("OCA animType is oral: " + (animType == "BJ" || animType == "HhBJ" || animType == "AgBJ" || animType == "DBJ"))
@@ -100,7 +104,7 @@ Event OnEjaculation(string eventname, string strArg, float cumAmount, Form sende
         EndIf
     EndIf
 
-    If autoCumAction == 0 && cumAction == -1; no action was taken
+    If autoCumAction == 0 && cumAction == -1 && debugMode; no action was taken
         console("OCA no action was taken")
         return
     ElseIf (autoCumAction > 2 && hasBottles) || cumAction == 2 && hasBottles ; bottle
@@ -113,14 +117,18 @@ Event OnEjaculation(string eventname, string strArg, float cumAmount, Form sende
 EndEvent
 
 Function spit(Float cumAmount, Actor sucker, Actor orgasmer)
-    console("OCA Chose to spit")
+    If (debugMode)
+        console("OCA Chose to spit")
+    EndIf
     Debug.Notification("You spit out their cum.")
     cumSpit += cumAmount
     ostim.PlaySound(sucker, spitting)
 EndFunction
 
 Function Swallow(Float cumAmount, Actor sucker, Actor orgasmer)
-    console("OCA Chose to swallow")
+    If debugMode
+        console("OCA Chose to swallow")
+    EndIf
     Debug.Notification("You swallow every last drop of their load.")
     cumSwallowed += cumAmount
     AdjustBelly(cumAmount)
@@ -129,12 +137,17 @@ Function Swallow(Float cumAmount, Actor sucker, Actor orgasmer)
 EndFunction
 
 Function Bottle(Float cumAmount, Actor sucker, Actor orgasmer)
-    console("OCA Chose to bottle")
+    If (debugMode)
+        console("OCA Chose to bottle")
+    EndIf
 EndFunction
 
 ;todo - the spells need to update if the mcm settings are changed - handle OnOptionAccept for the mcm sliders
 ;todo - the spells will need to update when decay is implemented and this func doesn't handle that - handle when decay is calculated
 Function UpdateAddictionSpells()
+    If debugMode
+        console("OCA Updating addiction spells")
+    EndIf
     If playerref.HasMagicEffect(UneffectedSpell.GetNthEffectMagicEffect(0)) && cumSwallowed > TolerantThreshhold
         playerref.AddSpell(TolerantSpell)
     ElseIf playerref.HasMagicEffect(TolerantSpell.GetNthEffectMagicEffect(0)) && cumSwallowed > DependentThreshhold
@@ -147,6 +160,10 @@ Function UpdateAddictionSpells()
 EndFunction
 
 Int Function GetAddictionLevel()
+    If (DebugMode)
+        console("OCA Getting addiction level")
+        console("addiction points = " + addictionPoints)
+    EndIf
     If (addictionPoints < TolerantThreshhold)
         return 0
     ElseIf (addictionPoints >= TolerantThreshhold && addictionPoints < DependentThreshhold)
@@ -161,18 +178,36 @@ Int Function GetAddictionLevel()
 EndFunction
 
 Function AdjustBelly(Float cumAmount)
+    If (DebugMode)
+        console("OCA Adding " + cumAmount + " to belly")
+        console("OCA belly current volume = " + bellyCum)
+    EndIf
     timeLastSwallowed = Utility.GetCurrentGameTime()
     UpdateBelly()
     bellyCum += cumAmount
+    If (DebugMode)
+        console("OCA belly new volume = " + bellyCum)
+    EndIf
 EndFunction
 
 ;todo - profile this to make sure it isn't laggy as fuck
 Function UpdateBelly()
+    If (DebugMode)
+        console("OCA udating belly")
+    EndIf
     If (bellyCum > 0)
         Float curTime = Utility.GetCurrentGameTime()
         Float digest = (curTime - timeSinceLastUpdate) * 24 * DigestRate ; flat starting rate per hr
+        If (DebugMode)
+            console("OCA curTime = " + curTime)
+            console("OCA digest before addiction level = " + digest)
+        EndIf
         Int AddictionLevel = GetAddictionLevel() 
         digest = digest * (1 + AddictionLevel / 2 - 1 / (AddictionLevel + 2)) ;50%, 117%, 175%, 230%, 284% as you become more addicted, you digest cum faster so it's harder to stave off withdrawl
+        If (DebugMode)
+            console("OCA addiction level = " + AddictionLevel)
+            console("OCA digest after addiction level = " + digest)
+        EndIf
         If (bellyCum < digest)
             bellyCum = 0
         Else
@@ -183,9 +218,16 @@ Function UpdateBelly()
 EndFunction
 
 Function UpdateAddictionPoints(float timePassed)
+    If (DebugMode)
+        console("OCA updating addiction points")
+    EndIf
     Float decay = timePassed * 24 * DecayRate
     decay = decay * (1 - (1 / (5 - GetAddictionLevel()) + 1 / 5)) ;100%, 95%, 87%, 70%, 20%
     addictionPoints -= decay
+    If (debugMode)
+        console("decay before addiction level = " + (timePassed * 24 * DecayRate))
+        console("decay after addiction level = " + decay)
+    EndIf
     UpdateAddictionSpells()
 EndFunction
 
