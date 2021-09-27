@@ -222,19 +222,17 @@ Function UpdateAddictionPoints(float timePassed)
     If (DebugMode)
         console("OCA updating addiction points")
     EndIf
-    If addictionPoints > 0
-        SetAddictionLevel()
-        Float decay = timePassed * 24 * DecayRate
-        decay = decay * (1 - (1 / (5 - AddictionLevel) + 1 / 5)) ;100%, 95%, 87%, 70%, 20%
-        if decay <= addictionPoints
-            addictionPoints -= decay
-        Else
-            addictionPoints = 0.0
-        EndIf
-        If (debugMode)
-            console("decay before addiction level = " + (timePassed * 24 * DecayRate))
-            console("decay after addiction level = " + decay)
-        EndIf
+    SetAddictionLevel()
+    Float decay = timePassed * 24 * DecayRate
+    decay = decay * (1 - (1 / (5 - AddictionLevel) + 1 / 5)) ;100%, 95%, 87%, 70%, 20%
+    if decay <= addictionPoints
+        addictionPoints -= decay
+    Else
+        addictionPoints = 0.0
+    EndIf
+    If (debugMode)
+        console("decay before addiction level = " + (timePassed * 24 * DecayRate))
+        console("decay after addiction level = " + decay)
     EndIf
     UpdateAddictionSpells()
 EndFunction
