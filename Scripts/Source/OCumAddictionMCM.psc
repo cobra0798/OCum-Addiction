@@ -17,6 +17,7 @@ Event OnConfigInit()
     oca.DependentThreshhold = 200.0
     oca.AddictThreshhold = 300.0
     oca.JunkieThreshhold = 400.0
+    oca.debugMode = True
 
     cumActionStrings = new String[5]
     cumActionStrings[0] = "No Action"
@@ -36,6 +37,7 @@ Event OnPageReset(string page)
         AddSliderOptionST("JUNKIE_THRESHHOLD_STATE", "Junkie Theshhold", oca.JunkieThreshhold, "{1} ML")
         AddSliderOptionST("DIGEST_RATE_STATE", "Digest Rate", oca.DigestRate, "{1} ML/HR")
         AddSliderOptionST("DECAY_RATE_STATE", "Decay Rate", oca.DecayRate, "{1} ML/HR")
+        AddToggleOptionST("DEBUG_MODE_STATE", "Enable debug messages", oca.debugMode)
         AddTextOptionST("IMPORT_STATE", "Import", "Click")
         AddTextOptionST("EXPORT_STATE", "Export", "Click")
     ElseIf(page == "stats")
@@ -69,6 +71,22 @@ State CUM_ACTION_STATE ;MENU
         event OnHighlightST()
             SetInfoText("Sets the default action to take for blowjobs in which the player is giving.")
         endEvent
+EndState
+
+State DEBUG_MODE_STATE ;TOGGLE
+    event OnSelectST()
+        oca.debugMode = !oca.debugMode
+        SetToggleOptionValueST(oca.debugMode)
+    endEvent
+
+    event OnDefaultST()
+        oca.debugMode = False
+        SetToggleOptionValueST(oca.debugMode)
+    endEvent
+
+    event OnHighlightST()
+        SetInfoText("When enabled, debug messages will show in console and notifications.")
+    EndEvent
 EndState
 
 State IMPORT_STATE ;TEXT

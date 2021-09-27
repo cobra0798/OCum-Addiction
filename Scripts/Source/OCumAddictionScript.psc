@@ -21,6 +21,7 @@ Float Property timeSinceLastUpdate Auto
 Float Property bellyCum Auto
 Float Property addictionPoints Auto
 Bool Property hasBottles Auto Conditional
+Bool Property debugMode Auto
 
 OSexIntegrationMain ostim
 OCumAddictionMCM mcm
