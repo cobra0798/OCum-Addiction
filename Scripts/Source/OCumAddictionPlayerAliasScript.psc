@@ -15,7 +15,7 @@ EndEvent
 
 Event OnUpdate()
 	Float curTime = Utility.GetCurrentGameTime()
-	OCumAddiction.UpdateAddictionPoints(curTime)
+	OCumAddiction.UpdateAddictionPoints(curTime - clock)
 	clock = curTime
 	RegisterForSingleUpdate(120)
 EndEvent
