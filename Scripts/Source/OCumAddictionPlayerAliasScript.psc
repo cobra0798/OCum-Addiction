@@ -1,22 +1,22 @@
 ScriptName OCumAddictionPlayerAliasScript Extends ReferenceAlias
 
-OCumAddictionScript Property OCumAddiction Auto
+OCumAddictionScript Property oca Auto
 Float clock
 
 Event OnInit()
-	OCumAddiction = (GetOwningQuest()) as OCumAddictionScript
+	oca = (GetOwningQuest()) as OCumAddictionScript
 	clock = Utility.GetCurrentGameTime()
 EndEvent
 
 Event OnPlayerLoadGame()
-	OCumAddiction.onload()
-	RegisterForSingleUpdate(120)
+	oca.onload()
+	RegisterForSingleUpdate(oca.UpdateFreq)
 EndEvent
 
 Event OnUpdate()
 	Float curTime = Utility.GetCurrentGameTime()
-	OCumAddiction.UpdateBelly(curTime - clock)
-	OCumAddiction.UpdateAddictionPoints(curTime - clock)
+	oca.UpdateBelly(curTime - clock)
+	oca.UpdateAddictionPoints(curTime - clock)
 	clock = curTime
-	RegisterForSingleUpdate(120)
+	RegisterForSingleUpdate(oca.UpdateFreq)
 EndEvent

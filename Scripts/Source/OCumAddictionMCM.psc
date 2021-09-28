@@ -20,6 +20,7 @@ Event OnConfigInit()
     oca.DecayRate = 1.0
     oca.DigestRate = 1.0
     oca.debugMode = False
+    oca.UpdateFreq = 120
 
     cumActionStrings = new String[5]
     cumActionStrings[0] = "No Action"
@@ -39,6 +40,7 @@ Event OnPageReset(string page)
         AddSliderOptionST("JUNKIE_THRESHHOLD_STATE", "Junkie Theshhold", oca.JunkieThreshhold, "{1} ML")
         AddSliderOptionST("DIGEST_RATE_STATE", "Digest Rate", oca.DigestRate, "{1} ML/HR")
         AddSliderOptionST("DECAY_RATE_STATE", "Decay Rate", oca.DecayRate, "{1} ML/HR")
+        AddSliderOptionST("UPDATE_FREQUENCY_STATE", "Update Frequency", oca.DecayRate, "{0} Seconds")
         AddToggleOptionST("DEBUG_MODE_STATE", "Enable debug messages", oca.debugMode)
         AddTextOptionST("IMPORT_STATE", "Import", "Click")
         AddTextOptionST("EXPORT_STATE", "Export", "Click")
@@ -269,6 +271,29 @@ State DECAY_RATE_STATE ;SLIDER
     EndEvent
 EndState
 
+State UPDATE_FREQUENCY_STATE ;SLIDER
+    Event OnSliderOpenST()
+        SetSliderDialogStartValue(oca.UpdateFreq)
+		SetSliderDialogDefaultValue(120)
+		SetSliderDialogRange(1, 300)
+		SetSliderDialogInterval(1.0)
+    EndEvent
+
+    Event OnSliderAcceptST(float option)
+        oca.UpdateFreq = option as int
+        SetSliderOptionValueST(oca.UpdateFreq, "{0} Seconds")
+    EndEvent
+
+    Event OnDefaultST()
+        oca.UpdateFreq = 120
+        SetSliderOptionValueST(oca.UpdateFreq, "{0} Seconds")
+    EndEvent
+
+    Event OnHighlightST()
+        SetInfoText("This is how often the game updates your addiction, withdrawl, and cum in stomach.\nLower values result in more script load, so don't set it too low.")
+    EndEvent
+EndState
+
 ;STATS PAGE
 State CUM_SWALLOWED_STATE ;TEXT
     event OnHighlightST()
@@ -323,6 +348,7 @@ Function ImportSettings()
         oca.DigestRate = JMap.GetFlt(ocaMCMSettings, "digestRate")
         oca.DecayRate = JMap.GetFlt(ocaMCMSettings, "decayRate")
         oca.debugMode = JMap.getInt(ocaMCMSettings, "debugMode") as Bool
+        oca.UpdateFreq = JMap.getInt(ocaMCMSettings, "updateFreq")
         ForcePageReset()
     EndIf
 EndFunction
@@ -337,6 +363,7 @@ Function ExportSettings()
     JMap.SetFlt(ocaMCMSettings, "digestRate", oca.DigestRate)
     JMap.SetFlt(ocaMCMSettings, "decayRate", oca.DecayRate)
     JMap.SetInt(ocaMCMSettings, "debugMode", oca.debugMode as Int)
+    JMap.SetInt(ocaMCMSettings, "updateFreq", oca.UpdateFreq)
     
     Jvalue.WriteToFile(ocaMCMSettings, JContainers.UserDirectory() + "OcaMCMSettings.json")
     ForcePageReset()

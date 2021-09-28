@@ -23,6 +23,7 @@ Float Property addictionPoints Auto
 Int Property AddictionLevel Auto Conditional
 Bool Property hasBottles Auto Conditional
 Bool Property debugMode Auto
+Int Property UpdateFreq Auto
 
 OSexIntegrationMain ostim
 OCumAddictionMCM mcm
