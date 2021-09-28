@@ -151,13 +151,13 @@ Function UpdateAddictionSpells()
     If debugMode
         console("OCA Updating addiction spells")
     EndIf
-    If playerref.HasMagicEffect(UneffectedSpell.GetNthEffectMagicEffect(0)) && cumSwallowed > TolerantThreshhold
+    If playerref.HasMagicEffect(UneffectedSpell.GetNthEffectMagicEffect(0)) && cumSwallowed >= TolerantThreshhold && cumSwallowed < DependentThreshhold
         playerref.AddSpell(TolerantSpell)
-    ElseIf playerref.HasMagicEffect(TolerantSpell.GetNthEffectMagicEffect(0)) && cumSwallowed > DependentThreshhold
+    ElseIf playerref.HasMagicEffect(TolerantSpell.GetNthEffectMagicEffect(0)) && cumSwallowed >= DependentThreshhold && cumSwallowed < AddictThreshhold
         playerref.AddSpell(DependentSpell)
-    ElseIf playerref.HasMagicEffect(DependentSpell.GetNthEffectMagicEffect(0)) && cumSwallowed > AddictThreshhold
+    ElseIf playerref.HasMagicEffect(DependentSpell.GetNthEffectMagicEffect(0)) && cumSwallowed >= AddictThreshhold && cumSwallowed < JunkieThreshhold
         playerref.AddSpell(AddictSpell)
-    ElseIf playerref.HasMagicEffect(AddictSpell.GetNthEffectMagicEffect(0)) && cumSwallowed > JunkieThreshhold
+    ElseIf playerref.HasMagicEffect(AddictSpell.GetNthEffectMagicEffect(0)) && cumSwallowed >= JunkieThreshhold
         playerref.AddSpell(JunkieSpell)
     EndIf
 EndFunction
@@ -165,7 +165,7 @@ EndFunction
 Function SetAddictionLevel()
     If (DebugMode)
         console("OCA Setting addiction level")
-        console("addiction points = " + addictionPoints)
+        console("OCA addiction points = " + addictionPoints)
     EndIf
     If (addictionPoints < TolerantThreshhold)
         AddictionLevel = 0
@@ -233,8 +233,8 @@ Function UpdateAddictionPoints(float timePassed)
         addictionPoints = 0.0
     EndIf
     If (debugMode)
-        console("decay before addiction level = " + (timePassed * 24 * DecayRate))
-        console("decay after addiction level = " + decay)
+        console("OCA decay before addiction level = " + (timePassed * 24 * DecayRate))
+        console("OCA decay after addiction level = " + decay)
     EndIf
     UpdateAddictionSpells()
 EndFunction
