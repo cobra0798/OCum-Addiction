@@ -206,7 +206,6 @@ Function UpdateBelly(float timePassed)
             console("timePassed = " + timePassed)
             console("digest before addiction level = " + digest)
         EndIf
-        SetAddictionLevel() 
         digest = digest * (1 + AddictionLevel / 2 - 1 / (AddictionLevel + 2)) ;50%, 117%, 175%, 230%, 284% as you become more addicted, you digest cum faster so it's harder to stave off withdrawl
         If (DebugMode)
             console("addiction level = " + AddictionLevel)
@@ -224,7 +223,6 @@ Function UpdateAddictionPoints(float timePassed)
     If (DebugMode)
         console("updating addiction points")
     EndIf
-    SetAddictionLevel()
     Float decay = timePassed * 24 * DecayRate
     decay = decay * (1 - (1 / (5 - AddictionLevel) + 1 / 5)) - decay * (bellyCum / (ocum.GetMaxCumStoragePossible(playerref) * 0.75)) ;First half: 100%, 95%, 87%, 70%, 20%
     if decay <= addictionPoints
@@ -232,6 +230,7 @@ Function UpdateAddictionPoints(float timePassed)
     Else
         addictionPoints = 0.0
     EndIf
+    SetAddictionLevel()
     If (debugMode)
         console("decay before addiction level = " + (timePassed * 24 * DecayRate))
         console("decay after addiction level = " + decay)
