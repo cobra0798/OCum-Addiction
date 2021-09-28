@@ -18,7 +18,7 @@ Float Property DigestRate Auto
 Float Property DecayRate Auto
 Float Property timeLastSwallowed Auto
 Float Property timeSinceLastUpdate Auto
-Float Property bellyCum Auto
+Float Property bellyCum Auto Conditional
 Float Property addictionPoints Auto
 Int Property AddictionLevel Auto Conditional
 Bool Property hasBottles Auto Conditional
