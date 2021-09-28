@@ -269,9 +269,9 @@ Float Function getBellyMax(Actor akActor)
         return max 
     else 
         If (ostim.IsFemale(akActor))
-            max = ocum.GetMaxCumStoragePossible(akActor) * 0.5
+            max = ocum.GetMaxCumStoragePossible(akActor) * 0.75
         Else
-            max = Utility.RandomFloat(15, 56) * 0.5
+            max = Utility.RandomFloat(15, 56) * 0.75
         EndIf
         ocum.StoreNPCDataFloat(akactor, "BellyCumVolume", max)
         return max
