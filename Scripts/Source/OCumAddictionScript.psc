@@ -229,7 +229,7 @@ Function UpdateAddictionPoints(float timePassed)
         console("updating addiction points")
     EndIf
     Float decay = timePassed * 24 * DecayRate
-    decay = decay * (1 - (1 / (5 - AddictionLevel) + 1 / 5)) - decay * (bellyCum / (ocum.GetMaxCumStoragePossible(playerref) * 0.75)) ;First half: 100%, 95%, 87%, 70%, 20%
+    decay = decay * ((4 - AddictionLevel) / (5 - AddictionLevel) + 1 / 5) - decay * (bellyCum / (ocum.GetMaxCumStoragePossible(playerref) * 0.50)) ;First half: 100%, 95%, 87%, 70%, 20%
     if decay <= addictionPoints
         addictionPoints -= decay
     Else
