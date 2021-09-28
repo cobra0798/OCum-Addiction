@@ -152,13 +152,13 @@ Function UpdateAddictionSpells()
     If debugMode
         console("Updating addiction spells")
     EndIf
-    If playerref.HasMagicEffect(UneffectedSpell.GetNthEffectMagicEffect(0)) && cumSwallowed >= TolerantThreshhold && cumSwallowed < DependentThreshhold
+    If playerref.HasMagicEffect(UneffectedSpell.GetNthEffectMagicEffect(0)) && addictionPoints >= TolerantThreshhold && addictionPoints < DependentThreshhold
         playerref.AddSpell(TolerantSpell)
-    ElseIf playerref.HasMagicEffect(TolerantSpell.GetNthEffectMagicEffect(0)) && cumSwallowed >= DependentThreshhold && cumSwallowed < AddictThreshhold
+    ElseIf playerref.HasMagicEffect(TolerantSpell.GetNthEffectMagicEffect(0)) && addictionPoints >= DependentThreshhold && addictionPoints < AddictThreshhold
         playerref.AddSpell(DependentSpell)
-    ElseIf playerref.HasMagicEffect(DependentSpell.GetNthEffectMagicEffect(0)) && cumSwallowed >= AddictThreshhold && cumSwallowed < JunkieThreshhold
+    ElseIf playerref.HasMagicEffect(DependentSpell.GetNthEffectMagicEffect(0)) && addictionPoints >= AddictThreshhold && addictionPoints < JunkieThreshhold
         playerref.AddSpell(AddictSpell)
-    ElseIf playerref.HasMagicEffect(AddictSpell.GetNthEffectMagicEffect(0)) && cumSwallowed >= JunkieThreshhold
+    ElseIf playerref.HasMagicEffect(AddictSpell.GetNthEffectMagicEffect(0)) && addictionPoints >= JunkieThreshhold
         playerref.AddSpell(JunkieSpell)
     EndIf
 EndFunction
