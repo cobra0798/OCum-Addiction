@@ -19,7 +19,7 @@ Event OnConfigInit()
     oca.JunkieThreshhold = 400.0
     oca.DecayRate = 1.0
     oca.DigestRate = 1.0
-    oca.debugMode = True
+    oca.debugMode = False
 
     cumActionStrings = new String[5]
     cumActionStrings[0] = "No Action"
@@ -322,6 +322,7 @@ Function ImportSettings()
         oca.JunkieThreshhold = JMap.GetFlt(ocaMCMSettings, "junkieThreshhold")
         oca.DigestRate = JMap.GetFlt(ocaMCMSettings, "digestRate")
         oca.DecayRate = JMap.GetFlt(ocaMCMSettings, "decayRate")
+        oca.debugMode = JMap.getInt(ocaMCMSettings, "debugMode") as Bool
         ForcePageReset()
     EndIf
 EndFunction
@@ -335,6 +336,7 @@ Function ExportSettings()
     JMap.SetFlt(ocaMCMSettings, "junkieThreshhold", oca.JunkieThreshhold)
     JMap.SetFlt(ocaMCMSettings, "digestRate", oca.DigestRate)
     JMap.SetFlt(ocaMCMSettings, "decayRate", oca.DecayRate)
+    JMap.SetInt(ocaMCMSettings, "debugMode", oca.debugMode as Int)
     
     Jvalue.WriteToFile(ocaMCMSettings, JContainers.UserDirectory() + "OcaMCMSettings.json")
     ForcePageReset()
