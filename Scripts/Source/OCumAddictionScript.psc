@@ -194,7 +194,18 @@ Function AdjustBelly(Float cumAmount)
         UpdateBelly(0)
     EndIf
     timeSinceLastUpdate = curTime
-    bellyCum += cumAmount
+    float max = getBellyMax(playerref)
+    If (bellyCum + cumAmount > max)
+        bellyCum = max
+        If (debugMode)
+            console("cumAmount went over max")
+            console("cumAmount = " + cumAmount)
+            console("bellyCum = " + bellyCum)
+            console("max = " + max)
+        EndIf
+    Else
+        bellyCum += cumAmount
+    EndIf
     If (DebugMode)
         console("belly new volume = " + bellyCum)
     EndIf
@@ -229,7 +240,7 @@ Function UpdateAddictionPoints(float timePassed)
         console("updating addiction points")
     EndIf
     Float decay = timePassed * 24 * DecayRate
-    decay = decay * ((4 - AddictionLevel) / (5 - AddictionLevel) + 1 / 5) - decay * (bellyCum / (ocum.GetMaxCumStoragePossible(playerref) * 0.50)) ;First half: 100%, 95%, 87%, 70%, 20%
+    decay = decay * ((4 - AddictionLevel) / (5 - AddictionLevel) + 1 / 5) - decay * (bellyCum / getBellyMax(playerref)) ;First half: 100%, 95%, 87%, 70%, 20%
     if decay <= addictionPoints
         addictionPoints -= decay
     Else
@@ -248,6 +259,22 @@ Float Function timeSinceLastSwallowed()
         return Utility.GetCurrentGameTime() - timeLastSwallowed
     Else
         return -1
+    EndIf
+EndFunction
+
+;slightly modified version of ocum's GetMaxCumStoragePossible function. Maybe PR it into ocum?
+Float Function getBellyMax(Actor akActor)
+    float max = ocum.GetNPCDataFloat(akActor, "BellyCumVolume")
+    if (max != -1)
+        return max 
+    else 
+        If (ostim.IsFemale(akActor))
+            max = ocum.GetMaxCumStoragePossible(akActor) * 0.5
+        Else
+            max = Utility.RandomFloat(15, 56) * 0.5
+        EndIf
+        ocum.StoreNPCDataFloat(akactor, "BellyCumVolume", max)
+        return max
     EndIf
 EndFunction
 
