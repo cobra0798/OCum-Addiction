@@ -26,6 +26,7 @@ Bool Property debugMode Auto
 
 OSexIntegrationMain ostim
 OCumAddictionMCM mcm
+OCumScript ocum
 Actor playerref
 Message cumMessageBox
 Sound swallowing
@@ -53,6 +54,7 @@ Event OnInit()
     console("OCum - Addiction installed")
 
     mcm = (self as Quest) as OCumAddictionMCM
+    ocum = Game.GetFormFromFile(0x000800, "OCum.esp") as OCumScript
     playerref = Game.GetPlayer()
     hasBottles = False
     cumMessageBox = Game.GetFormFromFile(0x000801, "OCumAddiction.esp") as Message
@@ -224,7 +226,7 @@ Function UpdateAddictionPoints(float timePassed)
     EndIf
     SetAddictionLevel()
     Float decay = timePassed * 24 * DecayRate
-    decay = decay * (1 - (1 / (5 - AddictionLevel) + 1 / 5)) ;100%, 95%, 87%, 70%, 20%
+    decay = decay * (1 - (1 / (5 - AddictionLevel) + 1 / 5)) - decay * (bellyCum / (ocum.GetMaxCumStoragePossible(playerref) * 0.75)) ;First half: 100%, 95%, 87%, 70%, 20%
     if decay <= addictionPoints
         addictionPoints -= decay
     Else
