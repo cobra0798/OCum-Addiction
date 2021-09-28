@@ -186,7 +186,9 @@ Function AdjustBelly(Float cumAmount)
         console("OCA belly current volume = " + bellyCum)
     EndIf
     timeLastSwallowed = Utility.GetCurrentGameTime()
-    UpdateBelly()
+    Float curTime = Utility.GetCurrentGameTime()
+    UpdateBelly(curTime - timeSinceLastUpdate)
+    timeSinceLastUpdate = curTime
     bellyCum += cumAmount
     If (DebugMode)
         console("OCA belly new volume = " + bellyCum)
@@ -194,15 +196,14 @@ Function AdjustBelly(Float cumAmount)
 EndFunction
 
 ;todo - profile this to make sure it isn't laggy as fuck
-Function UpdateBelly()
+Function UpdateBelly(float timePassed)
     If (DebugMode)
         console("OCA udating belly")
     EndIf
     If (bellyCum > 0)
-        Float curTime = Utility.GetCurrentGameTime()
-        Float digest = (curTime - timeSinceLastUpdate) * 24 * DigestRate ; flat starting rate per hr
+        Float digest = timePassed * 24 * DigestRate ; flat starting rate per hr
         If (DebugMode)
-            console("OCA curTime = " + curTime)
+            console("OCA timePassed = " + timePassed)
             console("OCA digest before addiction level = " + digest)
         EndIf
         SetAddictionLevel() 
@@ -216,7 +217,6 @@ Function UpdateBelly()
         Else
             bellyCum -= digest
         EndIf
-        timeSinceLastUpdate = curTime
     EndIf
 EndFunction
 
