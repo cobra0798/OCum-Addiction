@@ -5,10 +5,13 @@ Float clock
 
 Event OnInit()
 	oca = (GetOwningQuest()) as OCumAddictionScript
-	clock = Utility.GetCurrentGameTime()
+	clock = -1.0
 EndEvent
 
 Event OnPlayerLoadGame()
+	If (clock < 0)
+		clock = Utility.GetCurrentGameTime()
+	EndIf
 	oca.onload()
 	RegisterForSingleUpdate(oca.UpdateFreq)
 EndEvent
