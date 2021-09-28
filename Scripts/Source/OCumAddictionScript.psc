@@ -187,7 +187,11 @@ Function AdjustBelly(Float cumAmount)
     EndIf
     timeLastSwallowed = Utility.GetCurrentGameTime()
     Float curTime = Utility.GetCurrentGameTime()
-    UpdateBelly(curTime - timeSinceLastUpdate)
+    If timeSinceLastUpdate >= 0
+        UpdateBelly(curTime - timeSinceLastUpdate)
+    Else
+        UpdateBelly(0)
+    EndIf
     timeSinceLastUpdate = curTime
     bellyCum += cumAmount
     If (DebugMode)
