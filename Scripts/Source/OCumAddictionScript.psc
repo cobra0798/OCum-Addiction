@@ -222,7 +222,7 @@ Function UpdateBelly(float timePassed)
             console("timePassed = " + timePassed)
             console("digest before addiction level = " + digest)
         EndIf
-        digest = digest * (1 + AddictionLevel / 2 - 1 / (AddictionLevel + 2)) ;50%, 117%, 175%, 230%, 284% as you become more addicted, you digest cum faster so it's harder to stave off withdrawl
+        digest = digest * (1 + AddictionLevel / 4 - 1 / (AddictionLevel + 2)) ;as you become more addicted, you digest cum faster so it's harder to stave off withdrawl
         If (DebugMode)
             console("addiction level = " + AddictionLevel)
             console("digest after addiction level = " + digest)
@@ -239,8 +239,8 @@ Function UpdateAddictionPoints(float timePassed)
     If (DebugMode)
         console("updating addiction points")
     EndIf
-    Float decay = timePassed * 24 * DecayRate
-    decay = decay * ((4 - AddictionLevel) / (5 - AddictionLevel) + 1 / 5) - decay * (bellyCum / getBellyMax(playerref)) ;First half: 100%, 95%, 87%, 70%, 20%
+    Float decay = timePassed * 24
+    decay = decay * ((4 - AddictionLevel) / (5 - AddictionLevel) + 1 / 5) * DecayRate - decay * (bellyCum / getBellyMax(playerref)) * 2
     if decay <= addictionPoints
         addictionPoints -= decay
     Else
