@@ -38,8 +38,8 @@ Event OnPageReset(string page)
         AddSliderOptionST("DEPENDENT_THRESHHOLD_STATE", "Dependence Theshhold", oca.DependentThreshhold, "{1} ML")
         AddSliderOptionST("ADDICT_THRESHHOLD_STATE", "Addict Theshhold", oca.AddictThreshhold, "{1} ML")
         AddSliderOptionST("JUNKIE_THRESHHOLD_STATE", "Junkie Theshhold", oca.JunkieThreshhold, "{1} ML")
-        AddSliderOptionST("DIGEST_RATE_STATE", "Digest Rate", oca.DigestRate, "{1} ML/HR")
-        AddSliderOptionST("DECAY_RATE_STATE", "Decay Rate", oca.DecayRate, "{1} ML/HR")
+        AddSliderOptionST("DIGEST_RATE_STATE", "Digest Rate", oca.DigestRate, "{2} ML/HR")
+        AddSliderOptionST("DECAY_RATE_STATE", "Decay Rate", oca.DecayRate, "{2} ML/HR")
         AddSliderOptionST("UPDATE_FREQUENCY_STATE", "Update Frequency", oca.UpdateFreq, "{0} Seconds")
         AddToggleOptionST("DEBUG_MODE_STATE", "Enable debug messages", oca.debugMode)
         AddTextOptionST("IMPORT_STATE", "Import", "Click")
@@ -229,22 +229,22 @@ State DIGEST_RATE_STATE ;SLIDER
     Event OnSliderOpenST()
         SetSliderDialogStartValue(oca.DigestRate)
 		SetSliderDialogDefaultValue(1.0)
-		SetSliderDialogRange(0.0, 10.0)
-		SetSliderDialogInterval(1.0)
+		SetSliderDialogRange(0.0, 2.0)
+		SetSliderDialogInterval(0.01)
     EndEvent
 
     Event OnSliderAcceptST(float option)
         oca.DigestRate = option
-        SetSliderOptionValueST(oca.DigestRate, "{1} ML/HR")
+        SetSliderOptionValueST(oca.DigestRate, "{2} ML/HR")
     EndEvent
 
     Event OnDefaultST()
         oca.DigestRate = 1.0
-        SetSliderOptionValueST(oca.DigestRate, "{1} ML/HR")
+        SetSliderOptionValueST(oca.DigestRate, "{2} ML/HR")
     EndEvent
 
     Event OnHighlightST()
-        SetInfoText("This is the rate at which you will digest the cum in your belly and withdrawl will set in.")
+        SetInfoText("This is the rate at which you will digest the cum in your belly and withdrawl will set in.\nHigh values can make it nearly impossible to get addicted,\nwhile low values can make it nearly impossible to recover.")
     EndEvent
 EndState
 
@@ -252,22 +252,22 @@ State DECAY_RATE_STATE ;SLIDER
     Event OnSliderOpenST()
         SetSliderDialogStartValue(oca.DecayRate)
 		SetSliderDialogDefaultValue(1.0)
-		SetSliderDialogRange(0.0, 10.0)
-		SetSliderDialogInterval(1.0)
+		SetSliderDialogRange(0.0, 2.0)
+		SetSliderDialogInterval(0.01)
     EndEvent
 
     Event OnSliderAcceptST(float option)
         oca.DecayRate = option
-        SetSliderOptionValueST(oca.DecayRate, "{1} ML/HR")
+        SetSliderOptionValueST(oca.DecayRate, "{2} ML/HR")
     EndEvent
 
     Event OnDefaultST()
         oca.DigestRate = 1.0
-        SetSliderOptionValueST(oca.DecayRate, "{1} ML/HR")
+        SetSliderOptionValueST(oca.DecayRate, "{2} ML/HR")
     EndEvent
 
     Event OnHighlightST()
-        SetInfoText("This is the rate at which your addiction to cum will dwindle relative to the amount of cum in your belly.")
+        SetInfoText("This is the rate at which your addiction to cum will dwindle relative to the amount of cum in your belly.\nHigh values can make it nearly impossible to get addicted,\nwhile low values can make it nearly impossible to recover.")
     EndEvent
 EndState
 
@@ -276,7 +276,7 @@ State UPDATE_FREQUENCY_STATE ;SLIDER
         SetSliderDialogStartValue(oca.UpdateFreq)
 		SetSliderDialogDefaultValue(120)
 		SetSliderDialogRange(1, 300)
-		SetSliderDialogInterval(1.0)
+		SetSliderDialogInterval(1)
     EndEvent
 
     Event OnSliderAcceptST(float option)
