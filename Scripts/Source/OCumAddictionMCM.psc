@@ -10,9 +10,6 @@ Event OnConfigInit()
     pages = new String[2]
     pages[0] = "main"
     pages[1] = "stats"
-    oca.autoCumAction = 0
-    oca.cumSwallowed = 0.0
-    oca.cumSpit = 0.0
     oca.TolerantThreshhold = 100.0
     oca.DependentThreshhold = 200.0
     oca.AddictThreshhold = 300.0
@@ -21,19 +18,11 @@ Event OnConfigInit()
     oca.DigestRate = 1.0
     oca.debugMode = False
     oca.UpdateFreq = 120
-
-    cumActionStrings = new String[5]
-    cumActionStrings[0] = "No Action"
-    cumActionStrings[1] = "Spit"
-    cumActionStrings[2] = "Swallow"
-    cumActionStrings[3] = "Bottle, Spit Otherwise"
-    cumActionStrings[4] = "Bottle, Swallow Otherwise"
 EndEvent
 
 Event OnPageReset(string page)
     If (page == "main")
         SetCursorFillMode(TOP_TO_BOTTOM)
-        AddMenuOptionST("CUM_ACTION_STATE", "Spit, Swallow, or Bottle", cumActionStrings[oca.autoCumAction])
         AddSliderOptionST("TOLERANT_THRESHHOLD_STATE", "Tolerance Theshhold", oca.TolerantThreshhold, "{1} ML")
         AddSliderOptionST("DEPENDENT_THRESHHOLD_STATE", "Dependence Theshhold", oca.DependentThreshhold, "{1} ML")
         AddSliderOptionST("ADDICT_THRESHHOLD_STATE", "Addict Theshhold", oca.AddictThreshhold, "{1} ML")
@@ -45,37 +34,13 @@ Event OnPageReset(string page)
         AddTextOptionST("IMPORT_STATE", "Import", "Click")
         AddTextOptionST("EXPORT_STATE", "Export", "Click")
     ElseIf(page == "stats")
-        AddTextOptionST("CUM_SWALLOWED_STATE", "Cum Swallowed", oca.cumSwallowed)
-        AddTextOptionST("CUM_SPIT_STATE", "Cum Spit", oca.cumSpit)
-        AddTextOptionST("BELLY_CUM_STATE", "Cum in belly", oca.bellyCum)
+        AddTextOptionST("CUM_SWALLOWED_STATE", "Cum Swallowed", oca.getOCum().cumSwallowed)
+        AddTextOptionST("CUM_SPIT_STATE", "Cum Spit", oca.getOCum().cumSpit)
+        AddTextOptionST("BELLY_CUM_STATE", "Cum in belly", oca.getOCum().GetBellyCumStorage(oca.playerref))
         AddTextOptionST("ADDICTION_POINTS_STATE", "Addiction Points", oca.addictionPoints)
-        AddTextOptionST("TIME_LAST_SWALLOWED_STATE", "Last swallowed", oca.timeLastSwallowed)
-        AddTextOptionST("TIME_SINCE_LAST_UPDATE_STATE", "Last belly update", oca.timeSinceLastUpdate)
+        AddTextOptionST("TIME_SINCE_LAST_UPDATE_STATE", "Last belly update", oca.getOCum().GetNPCDataFloat(oca.playerref, "bellyCumTimeChecked"))
     EndIf
 EndEvent
-
-State CUM_ACTION_STATE ;MENU
-
-        event OnMenuOpenST()
-            SetMenuDialogStartIndex(oca.autoCumAction)
-            SetMenuDialogDefaultIndex(0)
-            SetMenuDialogOptions(cumActionStrings)
-        endEvent
-    
-        event OnMenuAcceptST(int a_index)
-            oca.autoCumAction = a_index
-            SetMenuOptionValueST(cumActionStrings[oca.autoCumAction])
-        endEvent
-    
-        event OnDefaultST()
-            oca.autoCumAction = 0    
-            SetTextOptionValueST(cumActionStrings[oca.autoCumAction])
-        endEvent
-    
-        event OnHighlightST()
-            SetInfoText("Sets the default action to take for blowjobs in which the player is giving.")
-        endEvent
-EndState
 
 State DEBUG_MODE_STATE ;TOGGLE
     event OnSelectST()
@@ -319,12 +284,6 @@ State ADDICTION_POINTS_STATE ;TEXT
     endEvent
 EndState
 
-State TIME_LAST_SWALLOWED_STATE ;TEXT
-    event OnHighlightST()
-        SetInfoText("The last time you swallowed cum.")
-    endEvent
-EndState
-
 State TIME_SINCE_LAST_UPDATE_STATE ;TEXT
     event OnHighlightST()
         SetInfoText("The last time the belly cum volume was updated.")
@@ -340,7 +299,6 @@ Function ImportSettings()
 		ocaMCMSettings = JValue.readFromFile(".\\Data\\OcaMCMSettings.json")
 	endif
     If ocaMCMSettings
-        oca.autoCumAction = JMap.GetInt(ocaMCMSettings, "autoCumAction")
         oca.TolerantThreshhold = JMap.GetFlt(ocaMCMSettings, "tolerantThreshhold")
         oca.DependentThreshhold = JMap.GetFlt(ocaMCMSettings, "dependentThreshhold")
         oca.AddictThreshhold = JMap.GetFlt(ocaMCMSettings, "addictThreshhold")
@@ -355,7 +313,6 @@ EndFunction
 
 Function ExportSettings()
     Int ocaMCMSettings = JMap.object()
-    JMap.SetInt(ocaMCMSettings, "autoCumAction", oca.autoCumAction)
     JMap.SetFlt(ocaMCMSettings, "tolerantThreshhold", oca.TolerantThreshhold)
     JMap.SetFlt(ocaMCMSettings, "dependentThreshhold", oca.DependentThreshhold)
     JMap.SetFlt(ocaMCMSettings, "addictThreshhold", oca.AddictThreshhold)

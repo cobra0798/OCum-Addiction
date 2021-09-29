@@ -1,37 +1,20 @@
 scriptname OCumAddictionScript extends Quest Conditional
 
-;properties
-;0 None
-;1 spit
-;2 swallow
-;3 bottle, spit otherwise
-;4 bottle, swallow otherwise
-Int Property autoCumAction Auto
-    
-Float Property cumSwallowed Auto
-Float Property cumSpit Auto
 Float Property TolerantThreshhold Auto
 Float Property DependentThreshhold Auto
 Float Property AddictThreshhold Auto
 Float Property JunkieThreshhold Auto
 Float Property DigestRate Auto
 Float Property DecayRate Auto
-Float Property timeLastSwallowed Auto
-Float Property timeSinceLastUpdate Auto
-Float Property bellyCum Auto Conditional
 Float Property addictionPoints Auto
 Int Property AddictionLevel Auto Conditional
-Bool Property hasBottles Auto Conditional
 Bool Property debugMode Auto
 Int Property UpdateFreq Auto
+Actor Property playerref Auto
 
 OSexIntegrationMain ostim
 OCumAddictionMCM mcm
 OCumScript ocum
-Actor playerref
-Message cumMessageBox
-Sound swallowing
-Sound spitting
 Spell UneffectedSpell
 Spell TolerantSpell
 Spell DependentSpell
@@ -57,10 +40,6 @@ Event OnInit()
     mcm = (self as Quest) as OCumAddictionMCM
     ocum = Game.GetFormFromFile(0x000800, "OCum.esp") as OCumScript
     playerref = Game.GetPlayer()
-    hasBottles = False
-    cumMessageBox = Game.GetFormFromFile(0x000801, "OCumAddiction.esp") as Message
-    swallowing = Game.GetFormFromFile(0x000805, "OCumAddiction.esp") as Sound
-    spitting = Game.GetFormFromFile(0x000807, "OCumAddiction.esp") as Sound
 
     UneffectedSpell = Game.GetFormFromFile(0x00080D, "OCumAddiction.esp") as Spell
     TolerantSpell = Game.GetFormFromFile(0x00080E, "OCumAddiction.esp") as Spell
@@ -68,86 +47,18 @@ Event OnInit()
     AddictSpell = Game.GetFormFromFile(0x000811, "OCumAddiction.esp") as Spell
     JunkieSpell = Game.GetFormFromFile(0x000812, "OCumAddiction.esp") as Spell
     playerref.AddSpell(UneffectedSpell, false)
-
-    timeLastSwallowed = -1.0
-    bellyCum = 0.0
     OnLoad()
 EndEvent
 
 Function OnLoad()
     console("Registering events")
-    RegisterForModEvent("ostim_prestart", "OnScenePreStart")
-    RegisterForModEvent("ocum_cum", "OnEjaculation")
+    RegisterForModEvent("ocum_swallow", "Swallow")
 EndFunction
 
-Event OnScenePreStart(string eventname, string strArg, float numArg, Form sender)
-    console("prestart event received")
-    hasBottles = False
-EndEvent
-
-Event OnEjaculation(string eventname, string strArg, float cumAmount, Form sender)
-    If debugMode
-        console("ocum event received")
-        console("Cum ML = " + cumAmount)
-    EndIf
-    Actor sucker = ostim.GetSubActor()
-    Actor orgasmer = ostim.GetMostRecentOrgasmedActor()
-    String animType = ostim.GetCurrentAnimationClass()
-    Int cumAction = -1
-    If autoCumAction == 0 ; If no default option was chosen
-        if debugMode
-            console("no default option was chosen.")
-        EndIf
-        If sucker == playerref && cumAmount > 0.0 && (animType == "BJ" || animType == "HhBJ" || animType == "AgBJ" || animType == "DBJ")
-            cumAction = cumMessageBox.Show()
-        ElseIf debugMode
-            console(sucker.GetDisplayName() + " == playerref: " + (sucker == playerref))
-            console(cumAmount + " > 0.0: " + (cumAmount > 0.0))
-            console("animType is oral: " + (animType == "BJ" || animType == "HhBJ" || animType == "AgBJ" || animType == "DBJ"))
-            console("AnimType = " + animType)
-        EndIf
-    EndIf
-
-    If autoCumAction == 0 && cumAction == -1 && debugMode; no action was taken
-        console("no action was taken")
-        return
-    ElseIf (autoCumAction > 2 && hasBottles) || cumAction == 2 && hasBottles ; bottle
-        Bottle(cumAmount, sucker, orgasmer)
-    ElseIf cumAction == 0 || autoCumAction == 1 || autoCumAction == 3; spit, or swallow when no bottles
-        Spit(cumAmount, sucker, orgasmer)
-    ElseIf cumAction == 1 || autoCumAction == 2 || autoCumAction == 4; swallow, or swallow when no bottles
-        Swallow(cumAmount, sucker, orgasmer)
-    EndIf
-EndEvent
-
-Function spit(Float cumAmount, Actor sucker, Actor orgasmer)
-    If (debugMode)
-        console("Chose to spit")
-    EndIf
-    Debug.Notification("You spit out their cum.")
-    cumSpit += cumAmount
-    ostim.PlaySound(sucker, spitting)
-EndFunction
-
-Function Swallow(Float cumAmount, Actor sucker, Actor orgasmer)
-    If debugMode
-        console("Chose to swallow")
-    EndIf
-    Debug.Notification("You swallow every last drop of their load.")
-    cumSwallowed += cumAmount
-    AdjustBelly(cumAmount)
+Event Swallow(Float cumAmount, Actor sucker, Actor orgasmer)
     updateAddictionSpells()
-    ostim.PlaySound(sucker, swallowing)
-EndFunction
+EndEvent
 
-Function Bottle(Float cumAmount, Actor sucker, Actor orgasmer)
-    If (debugMode)
-        console("Chose to bottle")
-    EndIf
-EndFunction
-
-;todo - the spells need to update if the mcm settings are changed - handle OnOptionAccept for the mcm sliders
-;todo - the spells will need to update when decay is implemented and this func doesn't handle that - handle when decay is calculated
 Function UpdateAddictionSpells()
     If debugMode
         console("Updating addiction spells")
@@ -179,59 +90,10 @@ Function SetAddictionLevel()
     ElseIf (addictionPoints >= JunkieThreshhold)
         AddictionLevel = 4
     EndIf
-EndFunction
-
-Function AdjustBelly(Float cumAmount)
-    If (DebugMode)
-        console("Adding " + cumAmount + " to belly")
-        console("belly current volume = " + bellyCum)
-    EndIf
-    timeLastSwallowed = Utility.GetCurrentGameTime()
-    Float curTime = Utility.GetCurrentGameTime()
-    If timeSinceLastUpdate >= 0
-        UpdateBelly(curTime - timeSinceLastUpdate)
-    Else
-        UpdateBelly(0)
-    EndIf
-    timeSinceLastUpdate = curTime
-    float max = getBellyMax(playerref)
-    If (bellyCum + cumAmount > max)
-        bellyCum = max
-        If (debugMode)
-            console("cumAmount went over max")
-            console("cumAmount = " + cumAmount)
-            console("bellyCum = " + bellyCum)
-            console("max = " + max)
-        EndIf
-    Else
-        bellyCum += cumAmount
-    EndIf
-    If (DebugMode)
-        console("belly new volume = " + bellyCum)
-    EndIf
-EndFunction
-
-;todo - profile this to make sure it isn't laggy as fuck
-Function UpdateBelly(float timePassed)
-    If (DebugMode)
-        console("udating belly")
-    EndIf
-    If (bellyCum > 0)
-        Float digest = timePassed * 24 * DigestRate ; flat starting rate per hr
-        If (DebugMode)
-            console("timePassed = " + timePassed)
-            console("digest before addiction level = " + digest)
-        EndIf
-        digest = digest * (1 + AddictionLevel / 4 - 1 / (AddictionLevel + 2)) ;as you become more addicted, you digest cum faster so it's harder to stave off withdrawl
-        If (DebugMode)
-            console("addiction level = " + AddictionLevel)
-            console("digest after addiction level = " + digest)
-        EndIf
-        If (bellyCum < digest)
-            bellyCum = 0
-        Else
-            bellyCum -= digest
-        EndIf
+    If (DigestRate > 0)
+        StorageUtil.SetFloatValue(none, "ocum.digestRate", AddictionLevel * DigestRate)
+    else
+        StorageUtil.SetFloatValue(none, "ocum.digestRate", AddictionLevel)
     EndIf
 EndFunction
 
@@ -240,7 +102,7 @@ Function UpdateAddictionPoints(float timePassed)
         console("updating addiction points")
     EndIf
     Float decay = timePassed * 24
-    decay = decay * ((4 - AddictionLevel) / (5 - AddictionLevel) + 1 / 5) * DecayRate - decay * (bellyCum / getBellyMax(playerref)) * 2
+    decay = decay * ((4 - AddictionLevel) / (5 - AddictionLevel) + 1 / 5) * DecayRate - decay * (ocum.GetBellyCumStorage(playerref) / ocum.getBellyMax(playerref)) * 2
     if decay <= addictionPoints
         addictionPoints -= decay
     Else
@@ -254,28 +116,8 @@ Function UpdateAddictionPoints(float timePassed)
     UpdateAddictionSpells()
 EndFunction
 
-Float Function timeSinceLastSwallowed()
-    If timeLastSwallowed > 0
-        return Utility.GetCurrentGameTime() - timeLastSwallowed
-    Else
-        return -1
-    EndIf
-EndFunction
-
-;slightly modified version of ocum's GetMaxCumStoragePossible function. Maybe PR it into ocum?
-Float Function getBellyMax(Actor akActor)
-    float max = ocum.GetNPCDataFloat(akActor, "BellyCumVolume")
-    if (max != -1)
-        return max 
-    else 
-        If (ostim.IsFemale(akActor))
-            max = ocum.GetMaxCumStoragePossible(akActor) * 0.75
-        Else
-            max = Utility.RandomFloat(15, 56) * 0.75
-        EndIf
-        ocum.StoreNPCDataFloat(akactor, "BellyCumVolume", max)
-        return max
-    EndIf
+OCumScript Function getOCum()
+    return ocum
 EndFunction
 
 Function console(String in)
