@@ -3,3 +3,4 @@ Scripts/*.pex
 meta.ini
 skyrimse.ppj
 SkyrimSE.code-workspace
+.gitignore
