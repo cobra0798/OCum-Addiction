@@ -47,6 +47,7 @@ Event OnInit()
     DependentSpell = Game.GetFormFromFile(0x000810, "OCumAddiction.esp") as Spell
     AddictSpell = Game.GetFormFromFile(0x000811, "OCumAddiction.esp") as Spell
     JunkieSpell = Game.GetFormFromFile(0x000812, "OCumAddiction.esp") as Spell
+    debugMode = Game.GetFormFromFile(0x000814, "OCumAddiction.esp") as GlobalVariable
     playerref.AddSpell(UneffectedSpell, false)
     OnLoad()
 EndEvent
