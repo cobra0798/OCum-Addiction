@@ -8,7 +8,8 @@ Float Property DigestRate Auto
 Float Property DecayRate Auto
 Float Property addictionPoints Auto
 Int Property AddictionLevel Auto Conditional
-Bool Property debugMode Auto
+Int Property WithdrawalLevel Auto Conditional
+GlobalVariable Property debugMode Auto
 Int Property UpdateFreq Auto
 Actor Property playerref Auto
 
@@ -60,7 +61,7 @@ Event Swallow(Float cumAmount, Actor sucker, Actor orgasmer)
 EndEvent
 
 Function UpdateAddictionSpells()
-    If debugMode
+    If debugMode.GetValue() == 1
         console("Updating addiction spells")
     EndIf
     If playerref.HasMagicEffect(UneffectedSpell.GetNthEffectMagicEffect(0)) && addictionPoints >= TolerantThreshhold && addictionPoints < DependentThreshhold
@@ -75,7 +76,7 @@ Function UpdateAddictionSpells()
 EndFunction
 
 Function SetAddictionLevel()
-    If (DebugMode)
+    If (DebugMode.GetValue() == 1)
         console("Setting addiction level")
         console("addiction points = " + addictionPoints)
     EndIf
@@ -98,7 +99,7 @@ Function SetAddictionLevel()
 EndFunction
 
 Function UpdateAddictionPoints(float timePassed)
-    If (DebugMode)
+    If (DebugMode.GetValue() == 1)
         console("updating addiction points")
     EndIf
     Float decay = timePassed * 24
@@ -109,7 +110,7 @@ Function UpdateAddictionPoints(float timePassed)
         addictionPoints = 0.0
     EndIf
     SetAddictionLevel()
-    If (debugMode)
+    If (debugMode.GetValue() == 1)
         console("decay before addiction level = " + (timePassed * 24 * DecayRate))
         console("decay after addiction level = " + decay)
     EndIf

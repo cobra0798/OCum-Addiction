@@ -16,7 +16,6 @@ Event OnConfigInit()
     oca.JunkieThreshhold = 400.0
     oca.DecayRate = 1.0
     oca.DigestRate = 1.0
-    oca.debugMode = False
     oca.UpdateFreq = 120
 EndEvent
 
@@ -30,7 +29,7 @@ Event OnPageReset(string page)
         AddSliderOptionST("DIGEST_RATE_STATE", "Digest Rate", oca.DigestRate, "{2} ML/HR")
         AddSliderOptionST("DECAY_RATE_STATE", "Decay Rate", oca.DecayRate, "{2} ML/HR")
         AddSliderOptionST("UPDATE_FREQUENCY_STATE", "Update Frequency", oca.UpdateFreq, "{0} Seconds")
-        AddToggleOptionST("DEBUG_MODE_STATE", "Enable debug messages", oca.debugMode)
+        AddToggleOptionST("DEBUG_MODE_STATE", "Enable debug messages", oca.debugMode.GetValue())
         AddTextOptionST("IMPORT_STATE", "Import", "Click")
         AddTextOptionST("EXPORT_STATE", "Export", "Click")
     ElseIf(page == "stats")
@@ -44,12 +43,16 @@ EndEvent
 
 State DEBUG_MODE_STATE ;TOGGLE
     event OnSelectST()
-        oca.debugMode = !oca.debugMode
+        if oca.debugMode.GetValue() == 0
+            oca.debugMode.SetValue(1)
+        Else
+            oca.debugMode.SetValue(0)
+        EndIf
         SetToggleOptionValueST(oca.debugMode)
     endEvent
 
     event OnDefaultST()
-        oca.debugMode = False
+        oca.debugMode.SetValue(0)
         SetToggleOptionValueST(oca.debugMode)
     endEvent
 
@@ -305,7 +308,7 @@ Function ImportSettings()
         oca.JunkieThreshhold = JMap.GetFlt(ocaMCMSettings, "junkieThreshhold")
         oca.DigestRate = JMap.GetFlt(ocaMCMSettings, "digestRate")
         oca.DecayRate = JMap.GetFlt(ocaMCMSettings, "decayRate")
-        oca.debugMode = JMap.getInt(ocaMCMSettings, "debugMode") as Bool
+        oca.debugMode.SetValue(JMap.getInt(ocaMCMSettings, "debugMode"))
         oca.UpdateFreq = JMap.getInt(ocaMCMSettings, "updateFreq")
         ForcePageReset()
     EndIf
@@ -319,7 +322,7 @@ Function ExportSettings()
     JMap.SetFlt(ocaMCMSettings, "junkieThreshhold", oca.JunkieThreshhold)
     JMap.SetFlt(ocaMCMSettings, "digestRate", oca.DigestRate)
     JMap.SetFlt(ocaMCMSettings, "decayRate", oca.DecayRate)
-    JMap.SetInt(ocaMCMSettings, "debugMode", oca.debugMode as Int)
+    JMap.SetInt(ocaMCMSettings, "debugMode", oca.debugMode.GetValue() as Int)
     JMap.SetInt(ocaMCMSettings, "updateFreq", oca.UpdateFreq)
     
     Jvalue.WriteToFile(ocaMCMSettings, JContainers.UserDirectory() + "OcaMCMSettings.json")
