@@ -96,7 +96,73 @@ EndEvent
 Function OnLoad()
     console("Registering events")
     RegisterForModEvent("ocum_cumoral", "OnEjaculation")
+    RegisterForModEvent("ostim_prestart", "OStimPreStart")
 EndFunction
+
+Event OStimPreStart(string eventname, string strArg, float numArg, Form sender)
+	Debug.StartStackProfiling()
+    console("prestart event received")
+	Bool rndInstalled = ostim.IsModLoaded("RealisticNeedsandDiseases.esp")
+	If (!rndInstalled)
+    	hasBottles = False
+	Else
+		if rndInstalled
+			If (playerRef.GetItemCount(Game.GetFormFromFile(0x0043B0, "RealisticNeedsandDiseases.esp")))
+				console("player has RND_EmptyBottle01")
+				hasBottles = True
+				bottleRefId = 0x0043B0
+				Debug.StopStackProfiling()
+				return
+			ElseIf (playerRef.GetItemCount(Game.GetFormFromFile(0x0043B2, "RealisticNeedsandDiseases.esp")))
+				console("player has RND_EmptyBottle02")
+				hasBottles = True
+				bottleRefId = 0x0043B2
+				Debug.StopStackProfiling()
+				return
+			ElseIf (playerRef.GetItemCount(Game.GetFormFromFile(0x0043B4, "RealisticNeedsandDiseases.esp")))
+				console("player has RND_EmptyBottle03")
+				hasBottles = True
+				bottleRefId = 0x0043B4
+				Debug.StopStackProfiling()
+				return
+			EndIf
+		EndIf
+		If (playerRef.GetItemCount(Game.GetFormFromFile(0x0F2012, "Skyrim.esm")))
+			console("player has WineBottle01AEmpty")
+			hasBottles = True
+			bottleRefId = 0x0F2012
+			Debug.StopStackProfiling()
+			return
+		ElseIf (playerRef.GetItemCount(Game.GetFormFromFile(0x0F2013, "Skyrim.esm")))
+			console("player has WineBottle01BEmpty")
+			hasBottles = True
+			bottleRefId = 0x0F2013
+			Debug.StopStackProfiling()
+			return
+		ElseIf (playerRef.GetItemCount(Game.GetFormFromFile(0x0F2014, "Skyrim.esm")))
+			console("player has WineBottle02AEmpty")
+			hasBottles = True
+			bottleRefId = 0x0F2014
+			Debug.StopStackProfiling()
+			return
+		ElseIf (playerRef.GetItemCount(Game.GetFormFromFile(0x0F2015, "Skyrim.esm")))
+			console("player has WineBottle02BEmpty")
+			hasBottles = True
+			bottleRefId = 0x0F2015
+			Debug.StopStackProfiling()
+			return
+		ElseIf (playerRef.GetItemCount(Game.GetFormFromFile(0x0FED17, "Skyrim.esm")))
+			console("player has WineSolitudeSpicedBottleEmpty")
+			hasBottles = True
+			bottleRefId = 0x0FED17
+			Debug.StopStackProfiling()
+			return
+		EndIf
+		hasBottles = False
+		Debug.StopStackProfiling()
+		return
+	EndIf
+EndEvent
 
 Event OnEjaculation(string eventName, string strArg, float cumAmount, Form sender)
     Actor orgasmer = ostim.GetMostRecentOrgasmedActor()
