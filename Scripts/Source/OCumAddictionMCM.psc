@@ -8,8 +8,8 @@ String[] pointsOfView
 Event OnConfigInit()
     oca = (Self as Quest) as OCumAddictionScript
     pages = new String[2]
-    pages[0] = "main"
-    pages[1] = "stats"
+    pages[0] = "$oca_page_main"
+    pages[1] = "$oca_page_stats"
     oca.TolerantThreshhold = 100.0
     oca.DependentThreshhold = 200.0
     oca.AddictThreshhold = 300.0
@@ -17,29 +17,63 @@ Event OnConfigInit()
     oca.DecayRate = 1.0
     oca.DigestRate = 1.0
     oca.UpdateFreq = 120
+
+	cumActionStrings = new String[8]
+	cumActionStrings[0] = "$oca_cum_action_none"
+	cumActionStrings[1] = "$oca_cum_action_spit"
+	cumActionStrings[2] = "$oca_cum_action_swallow"
+	cumActionStrings[3] = "$oca_cum_action_random"
+	cumActionStrings[4] = "$oca_cum_action_bottle_ask"
+	cumActionStrings[5] = "$oca_cum_action_bottle_spit"
+	cumActionStrings[6] = "$oca_cum_action_bottle_swallow"
+	cumActionStrings[7] = "$oca_cum_action_bottle_random"
 EndEvent
 
 Event OnPageReset(string page)
     If (page == "main")
         SetCursorFillMode(TOP_TO_BOTTOM)
-        AddSliderOptionST("TOLERANT_THRESHHOLD_STATE", "Tolerance Theshhold", oca.TolerantThreshhold, "{1} ML")
-        AddSliderOptionST("DEPENDENT_THRESHHOLD_STATE", "Dependence Theshhold", oca.DependentThreshhold, "{1} ML")
-        AddSliderOptionST("ADDICT_THRESHHOLD_STATE", "Addict Theshhold", oca.AddictThreshhold, "{1} ML")
-        AddSliderOptionST("JUNKIE_THRESHHOLD_STATE", "Junkie Theshhold", oca.JunkieThreshhold, "{1} ML")
-        AddSliderOptionST("DIGEST_RATE_STATE", "Digest Rate", oca.DigestRate, "{2} ML/HR")
-        AddSliderOptionST("DECAY_RATE_STATE", "Decay Rate", oca.DecayRate, "{2} ML/HR")
-        AddSliderOptionST("UPDATE_FREQUENCY_STATE", "Update Frequency", oca.UpdateFreq, "{0} Seconds")
-        AddToggleOptionST("DEBUG_MODE_STATE", "Enable debug messages", oca.debugMode.GetValue())
-        AddTextOptionST("IMPORT_STATE", "Import", "Click")
-        AddTextOptionST("EXPORT_STATE", "Export", "Click")
+        AddMenuOptionST("CUM_ACTION_STATE", "$oca_cum_action", cumActionStrings[oca.autoCumAction])
+        AddSliderOptionST("TOLERANT_THRESHHOLD_STATE", "$oca_tolerance_threshhold", oca.TolerantThreshhold, "{1} ML")
+        AddSliderOptionST("DEPENDENT_THRESHHOLD_STATE", "$oca_dependence_threshhold", oca.DependentThreshhold, "{1} ML")
+        AddSliderOptionST("ADDICT_THRESHHOLD_STATE", "$oca_addict_threshhold", oca.AddictThreshhold, "{1} ML")
+        AddSliderOptionST("JUNKIE_THRESHHOLD_STATE", "$oca_junkie_threshhold", oca.JunkieThreshhold, "{1} ML")
+        AddSliderOptionST("DIGEST_RATE_STATE", "$oca_digest_rate", oca.DigestRate, "{2} ML/HR")
+        AddSliderOptionST("DECAY_RATE_STATE", "$oca_decay_rate", oca.DecayRate, "{2} ML/HR")
+        AddSliderOptionST("UPDATE_FREQUENCY_STATE", "$oca_update_frequency", oca.UpdateFreq, "{0} Seconds")
+        AddToggleOptionST("DEBUG_MODE_STATE", "$oca_enable_debug", oca.debugMode.GetValue())
+        AddTextOptionST("IMPORT_STATE", "$oca_import_settings", "$oca_click")
+        AddTextOptionST("EXPORT_STATE", "$oca_export_settings", "$oca_click")
     ElseIf(page == "stats")
-        AddTextOptionST("CUM_SWALLOWED_STATE", "Cum Swallowed", oca.GetTotalCumSwallowed(oca.playerref))
-        AddTextOptionST("CUM_SPIT_STATE", "Cum Spit", oca.GetTotalCumSpit(oca.playerref))
-        AddTextOptionST("BELLY_CUM_STATE", "Cum in belly", oca.GetBellyCumStorage(oca.playerref))
-        AddTextOptionST("ADDICTION_POINTS_STATE", "Addiction Points", oca.addictionPoints)
-        AddTextOptionST("TIME_SINCE_LAST_UPDATE_STATE", "Last belly update", oca.getOCum().GetNPCDataFloat(oca.playerref, "bellyCumTimeChecked"))
+        AddTextOptionST("CUM_SWALLOWED_STATE", "$oca_cum_swallowed", oca.GetTotalCumSwallowed(oca.playerref))
+        AddTextOptionST("CUM_SPIT_STATE", "$oca_cum_spit", oca.GetTotalCumSpit(oca.playerref))
+        AddTextOptionST("BELLY_CUM_STATE", "$oca_cum_belly", oca.GetBellyCumStorage(oca.playerref))
+        AddTextOptionST("ADDICTION_POINTS_STATE", "$oca_addiction_points", oca.addictionPoints)
+        AddTextOptionST("TIME_SINCE_LAST_UPDATE_STATE", "$oca_last_update", oca.getOCum().GetNPCDataFloat(oca.playerref, "bellyCumTimeChecked"))
     EndIf
 EndEvent
+
+State CUM_ACTION_STATE ;MENU
+
+    event OnMenuOpenST()
+        SetMenuDialogStartIndex(oca.autoCumAction)
+        SetMenuDialogDefaultIndex(0)
+        SetMenuDialogOptions(cumActionStrings)
+    endEvent
+
+    event OnMenuAcceptST(int a_index)
+        oca.autoCumAction = a_index
+        SetMenuOptionValueST(cumActionStrings[oca.autoCumAction])
+    endEvent
+
+    event OnDefaultST()
+        oca.autoCumAction = 0    
+        SetTextOptionValueST(cumActionStrings[oca.autoCumAction])
+    endEvent
+
+    event OnHighlightST()
+        SetInfoText("$oca_tooltip_cum_action")
+    endEvent
+EndState
 
 State DEBUG_MODE_STATE ;TOGGLE
     event OnSelectST()
@@ -57,17 +91,17 @@ State DEBUG_MODE_STATE ;TOGGLE
     endEvent
 
     event OnHighlightST()
-        SetInfoText("When enabled, debug messages will show in console and notifications.")
+        SetInfoText("$oca_tooltip_debug_mode")
     EndEvent
 EndState
 
 State IMPORT_STATE ;TEXT
     event OnHighlightST()
-        SetInfoText("Click here to import settings.")
+        SetInfoText("$oca_tooltip_import_settings")
     endEvent
 
     event onSelectST()
-        if ShowMessage("Are you sure you want to import settings?\nThey will override your current settings.", true)
+        if ShowMessage("$oca_import_confirm", true)
             ImportSettings()
         endif
     endEvent
@@ -75,11 +109,11 @@ EndState
 
 State EXPORT_STATE ;TEXT
     event OnHighlightST()
-        SetInfoText("Click here to export settings.")
+        SetInfoText("$oca_tooltip_export_settings")
     endEvent
 
     event onSelectST()
-        if ShowMessage("Are you sure you want to export settings?\nThey will override your stored settings.", true)
+        if ShowMessage("$oca_export_confirm", true)
             ExportSettings()
         endif
     endEvent
@@ -98,7 +132,7 @@ State TOLERANT_THRESHHOLD_STATE ;SLIDER
             oca.TolerantThreshhold = option
             SetSliderOptionValueST(oca.TolerantThreshhold, "{1} ML")
         Else
-            ShowMessage("Please make sure that the tolerance threshhold is greater than 0 and less than the dependence threshhold.", False)
+            ShowMessage("$oca_tolerance_error", False)
         EndIf
     EndEvent
 
@@ -108,7 +142,7 @@ State TOLERANT_THRESHHOLD_STATE ;SLIDER
     EndEvent
 
     Event OnHighlightST()
-        SetInfoText("This is the threshhold after which you will have built up a cum tolerance.")
+        SetInfoText("$oca_tooltip_tolerance_threshhold")
     EndEvent
 EndState
 
@@ -125,7 +159,7 @@ State DEPENDENT_THRESHHOLD_STATE ;SLIDER
             oca.DependentThreshhold = option
             SetSliderOptionValueST(oca.DependentThreshhold, "{1} ML")
         Else
-            ShowMessage("Please make sure that the dependence threshhold is greater than the tolerance threshhold and less than the addict threshhold.", False)
+            ShowMessage("$oca_dependence_error", False)
         EndIf
     EndEvent
 
@@ -135,7 +169,7 @@ State DEPENDENT_THRESHHOLD_STATE ;SLIDER
     EndEvent
 
     Event OnHighlightST()
-        SetInfoText("This is the threshhold after which you will have become dependent on cum.")
+        SetInfoText("$oca_tooltip_dependence_threshhold")
     EndEvent
 EndState
 
@@ -152,7 +186,7 @@ State ADDICT_THRESHHOLD_STATE ;SLIDER
             oca.AddictThreshhold = option
             SetSliderOptionValueST(oca.AddictThreshhold, "{1} ML")
         Else
-            ShowMessage("Please make sure that the addict threshhold is greater than the dependence threshhold and less than the junkie threshhold.", False)
+            ShowMessage("$oca_addict_error", False)
         EndIf
     EndEvent
 
@@ -162,7 +196,7 @@ State ADDICT_THRESHHOLD_STATE ;SLIDER
     EndEvent
 
     Event OnHighlightST()
-        SetInfoText("This is the threshhold after which you will have become completely addicted to cum.")
+        SetInfoText("$oca_tooltip_addict_threshhold")
     EndEvent
 EndState
 
@@ -179,7 +213,7 @@ State JUNKIE_THRESHHOLD_STATE ;SLIDER
             oca.JunkieThreshhold = option
             SetSliderOptionValueST(oca.JunkieThreshhold, "{1} ML")
         Else
-            ShowMessage("Please make sure that the tolerance threshhold is greater than the addict threshhold.", False)
+            ShowMessage("$oca_junkie_error", False)
         EndIf
     EndEvent
 
@@ -189,7 +223,7 @@ State JUNKIE_THRESHHOLD_STATE ;SLIDER
     EndEvent
 
     Event OnHighlightST()
-        SetInfoText("This is the threshhold after which you will have become a cum junkie.")
+        SetInfoText("$oca_tooltip_junkie_threshhold")
     EndEvent
 EndState
 
@@ -212,7 +246,7 @@ State DIGEST_RATE_STATE ;SLIDER
     EndEvent
 
     Event OnHighlightST()
-        SetInfoText("This is the rate at which you will digest the cum in your belly and withdrawl will set in.\nHigh values can make it nearly impossible to get addicted,\nwhile low values can make it nearly impossible to recover.")
+        SetInfoText("$oca_tooltip_digest_rate")
     EndEvent
 EndState
 
@@ -235,7 +269,7 @@ State DECAY_RATE_STATE ;SLIDER
     EndEvent
 
     Event OnHighlightST()
-        SetInfoText("This is the rate at which your addiction to cum will dwindle relative to the amount of cum in your belly.\nHigh values can make it nearly impossible to get addicted,\nwhile low values can make it nearly impossible to recover.")
+        SetInfoText("$oca_tooltip_decay_rate")
     EndEvent
 EndState
 
@@ -258,38 +292,38 @@ State UPDATE_FREQUENCY_STATE ;SLIDER
     EndEvent
 
     Event OnHighlightST()
-        SetInfoText("This is how often the game updates your addiction, withdrawl, and cum in stomach.\nLower values result in more script load, so don't set it too low.")
+        SetInfoText("$oca_tooltip_update_frequency")
     EndEvent
 EndState
 
 ;STATS PAGE
 State CUM_SWALLOWED_STATE ;TEXT
     event OnHighlightST()
-        SetInfoText("The total amount of cum you have swallowed.")
+        SetInfoText("$oca_tooltip_cum_swallowed")
     endEvent
 EndState
 
 State CUM_SPIT_STATE ;TEXT
     event OnHighlightST()
-        SetInfoText("The total amount of cum you have spit out.")
+        SetInfoText("$oca_tooltip_cum_spit")
     endEvent
 EndState
 
 State BELLY_CUM_STATE ;TEXT
     event OnHighlightST()
-        SetInfoText("The amount of cum currently in your belly.")
+        SetInfoText("$oca_tooltip_cum_belly")
     endEvent
 EndState
 
 State ADDICTION_POINTS_STATE ;TEXT
     event OnHighlightST()
-        SetInfoText("The number of addiction points you have accrued.")
+        SetInfoText("$oca_tooltip_addiction_points")
     endEvent
 EndState
 
 State TIME_SINCE_LAST_UPDATE_STATE ;TEXT
     event OnHighlightST()
-        SetInfoText("The last time the belly cum volume was updated.")
+        SetInfoText("$oca_tooltip_last_update")
     endEvent
 EndState
 
@@ -302,6 +336,7 @@ Function ImportSettings()
 		ocaMCMSettings = JValue.readFromFile(".\\Data\\OcaMCMSettings.json")
 	endif
     If ocaMCMSettings
+        oca.autoCumAction = JMap.GetInt(ocaMCMSettings, "autoCumAction")
         oca.TolerantThreshhold = JMap.GetFlt(ocaMCMSettings, "tolerantThreshhold")
         oca.DependentThreshhold = JMap.GetFlt(ocaMCMSettings, "dependentThreshhold")
         oca.AddictThreshhold = JMap.GetFlt(ocaMCMSettings, "addictThreshhold")
@@ -316,6 +351,7 @@ EndFunction
 
 Function ExportSettings()
     Int ocaMCMSettings = JMap.object()
+    JMap.SetInt(ocaMCMSettings, "autoCumAction", oca.autoCumAction)
     JMap.SetFlt(ocaMCMSettings, "tolerantThreshhold", oca.TolerantThreshhold)
     JMap.SetFlt(ocaMCMSettings, "dependentThreshhold", oca.DependentThreshhold)
     JMap.SetFlt(ocaMCMSettings, "addictThreshhold", oca.AddictThreshhold)
