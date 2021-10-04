@@ -45,7 +45,10 @@ Spell JunkieSpell
 Message cumMessageBox
 Sound swallowing
 Sound spitting
+Potion cumBottle
+
 int bottleRefId
+string bottleRefEsp
 
 string bellyCumTimeCheckedKey
 string maxBellyCumKey
@@ -82,6 +85,7 @@ Event OnInit()
     cumMessageBox = Game.GetFormFromFile(0x000801, "OCumAddiction.esp") as Message
     swallowing = Game.GetFormFromFile(0x000804, "OCumAddiction.esp") as Sound
     spitting = Game.GetFormFromFile(0x000805, "OCumAddiction.esp") as Sound
+    cumBottle = Game.GetFormFromFile(0x000816, "OCumAddiction.esp") as Potion
 
 	maxBellyCumKey = "MaxBellyCumVolume"
 	bellyCumKey = "BellyCumVolume"
@@ -111,18 +115,21 @@ Event OStimPreStart(string eventname, string strArg, float numArg, Form sender)
 				console("player has RND_EmptyBottle01")
 				hasBottles = True
 				bottleRefId = 0x0043B0
+                bottleRefEsp = "RealisticNeedsandDiseases.esp"
 				Debug.StopStackProfiling()
 				return
 			ElseIf (playerRef.GetItemCount(Game.GetFormFromFile(0x0043B2, "RealisticNeedsandDiseases.esp")))
 				console("player has RND_EmptyBottle02")
 				hasBottles = True
 				bottleRefId = 0x0043B2
+                bottleRefEsp = "RealisticNeedsandDiseases.esp"
 				Debug.StopStackProfiling()
 				return
 			ElseIf (playerRef.GetItemCount(Game.GetFormFromFile(0x0043B4, "RealisticNeedsandDiseases.esp")))
 				console("player has RND_EmptyBottle03")
 				hasBottles = True
 				bottleRefId = 0x0043B4
+                bottleRefEsp = "RealisticNeedsandDiseases.esp"
 				Debug.StopStackProfiling()
 				return
 			EndIf
@@ -131,30 +138,35 @@ Event OStimPreStart(string eventname, string strArg, float numArg, Form sender)
 			console("player has WineBottle01AEmpty")
 			hasBottles = True
 			bottleRefId = 0x0F2012
+            bottleRefEsp = "Skyrim.esm"
 			Debug.StopStackProfiling()
 			return
 		ElseIf (playerRef.GetItemCount(Game.GetFormFromFile(0x0F2013, "Skyrim.esm")))
 			console("player has WineBottle01BEmpty")
 			hasBottles = True
 			bottleRefId = 0x0F2013
+            bottleRefEsp = "Skyrim.esm"
 			Debug.StopStackProfiling()
 			return
 		ElseIf (playerRef.GetItemCount(Game.GetFormFromFile(0x0F2014, "Skyrim.esm")))
 			console("player has WineBottle02AEmpty")
 			hasBottles = True
 			bottleRefId = 0x0F2014
+            bottleRefEsp = "Skyrim.esm"
 			Debug.StopStackProfiling()
 			return
 		ElseIf (playerRef.GetItemCount(Game.GetFormFromFile(0x0F2015, "Skyrim.esm")))
 			console("player has WineBottle02BEmpty")
 			hasBottles = True
 			bottleRefId = 0x0F2015
+            bottleRefEsp = "Skyrim.esm"
 			Debug.StopStackProfiling()
 			return
 		ElseIf (playerRef.GetItemCount(Game.GetFormFromFile(0x0FED17, "Skyrim.esm")))
 			console("player has WineSolitudeSpicedBottleEmpty")
 			hasBottles = True
 			bottleRefId = 0x0FED17
+            bottleRefEsp = "Skyrim.esm"
 			Debug.StopStackProfiling()
 			return
 		EndIf
@@ -255,6 +267,12 @@ EndFunction
 Function Bottle(Float cumAmount, Actor sucker, Actor orgasmer)
 	SendModEvent("ocum_bottle", numArg = cumAmount)
 	console("Chose to bottle")
+    sucker.RemoveItem(Game.GetFormFromFile(bottleRefId, bottleRefEsp), abSilent = True)
+    If (sucker == playerref)
+        sucker.AddItem(cumBottle)
+    Else
+        sucker.AddItem(cumBottle, abSilent = True)
+    EndIf
 EndFunction
 
 Function RandomCumAction(Float cumAmount, Actor sucker, Actor orgasmer)
