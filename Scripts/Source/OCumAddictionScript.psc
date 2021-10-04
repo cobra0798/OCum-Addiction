@@ -85,7 +85,7 @@ Event OnInit()
     cumMessageBox = Game.GetFormFromFile(0x000801, "OCumAddiction.esp") as Message
     swallowing = Game.GetFormFromFile(0x000804, "OCumAddiction.esp") as Sound
     spitting = Game.GetFormFromFile(0x000805, "OCumAddiction.esp") as Sound
-    cumBottle = Game.GetFormFromFile(0x000816, "OCumAddiction.esp") as Potion
+    cumBottle = Game.GetFormFromFile(0x000815, "OCumAddiction.esp") as Potion
 
 	maxBellyCumKey = "MaxBellyCumVolume"
 	bellyCumKey = "BellyCumVolume"
