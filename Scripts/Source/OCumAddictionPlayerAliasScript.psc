@@ -18,7 +18,7 @@ EndEvent
 
 Event OnUpdate()
 	Float curTime = Utility.GetCurrentGameTime()
-	oca.getOCum().UpdateBelly(curTime - clock, self.GetActorReference())
+	oca.UpdateBelly(curTime - clock, self.GetActorReference())
 	oca.UpdateAddictionPoints(curTime - clock)
 	clock = curTime
 	RegisterForSingleUpdate(oca.UpdateFreq)
